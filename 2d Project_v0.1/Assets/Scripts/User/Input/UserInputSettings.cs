@@ -28,7 +28,7 @@ namespace UserInput
 			}
 			else
 			{
-				throw new System.Exception("Ther error!");
+				throw new System.Exception("Make sure there is only one game object with the UserInputSettings script attached!");
 			}
 		}
 

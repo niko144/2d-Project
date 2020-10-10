@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+// Written by Lukas Sacher/Camo
 public class CameraFollow : MonoBehaviour
 {
     public Transform target;
