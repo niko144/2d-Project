@@ -22,7 +22,7 @@ namespace UserInput
 
 		private void Awake()
 		{
-			if(current.gameObject == null)
+			if(current == null || current.gameObject == null)
 			{
 				current = this;
 			}
