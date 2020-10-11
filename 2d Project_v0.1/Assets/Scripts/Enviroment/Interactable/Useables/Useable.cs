@@ -6,7 +6,7 @@ namespace Useable
     // Written by Lukas Sacher/Camo
     public class Useable : MonoBehaviour
     {
-		#region info
+		#region Info
 
         /* This class is only a base class.
          * For more complex useables you can make a custom class in the Useable.Custom namespace.

@@ -4,6 +4,7 @@ using PlayerInput;
 namespace PlayerMovement
 {
     //Written by LukasSacher / Camo
+    [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerMovementController : MonoBehaviour
     {
         public float speed;
