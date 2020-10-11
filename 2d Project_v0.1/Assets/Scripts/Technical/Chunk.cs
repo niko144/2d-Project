@@ -17,14 +17,7 @@ namespace Chunks
 
 		private void Start()
 		{
-			player = ChunkMaster.current.player;
-			loadingDist = ChunkMaster.current.loadingDistance;
-
-			container = transform.GetChild(0).gameObject;
-			if (!container.transform.name.Contains("Container"))
-			{
-				Debug.LogWarning("The content of a chunks has to be in a seperate container.");
-			}
+			GetData();
 		}
 
 		private void Update()
@@ -35,6 +28,18 @@ namespace Chunks
 		void CheckForChunkLoad()
 		{
 			container.SetActive(Vector2.Distance(transform.position, player.transform.position) <= loadingDist);
+		}
+
+		void GetData()
+		{
+			player = ChunkMaster.current.player;
+			loadingDist = ChunkMaster.current.loadingDistance;
+
+			container = transform.GetChild(0).gameObject;
+			if (!container.transform.name.Contains("Container"))
+			{
+				Debug.LogWarning("The content of a chunks has to be in a seperate container.");
+			}
 		}
 
 		private void OnDrawGizmos()
