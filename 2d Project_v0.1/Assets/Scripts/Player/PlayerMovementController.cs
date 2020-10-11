@@ -6,13 +6,13 @@ namespace PlayerMovement
     //Written by LukasSacher / Camo
     public class PlayerMovementController : MonoBehaviour
     {
-        public Rigidbody2D rb;
         public float speed;
-
+        Rigidbody2D rb;
         Vector2 moveInput;
 
         private void Start()
         {
+            rb = GetComponent<Rigidbody2D>();
             UserInput.moveUp += UpInput;
             UserInput.moveDown += DownInput;
             UserInput.moveLeft += LeftInput;
@@ -58,7 +58,6 @@ namespace PlayerMovement
         void Move()
         {
             moveInput.Normalize();
-
             rb.velocity = moveInput * speed * Time.deltaTime;
         }
     }
