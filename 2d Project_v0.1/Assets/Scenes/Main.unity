@@ -439,7 +439,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.09999999
+  m_Radius: 0.08984659
 --- !u!1 &1664452008
 GameObject:
   m_ObjectHideFlags: 0
@@ -648,7 +648,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d7472c4d7930534780a18b80d4e8ed8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 2000600791}
   speed: 200
 --- !u!50 &2000600791
 Rigidbody2D:
@@ -695,7 +694,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.16, y: 0.16}
+  m_Size: {x: 0.1384317, y: 0.14274552}
   m_EdgeRadius: 0
 --- !u!1 &2055632728
 GameObject:
