@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace UserInput
+namespace PlayerInput
 {
 	// Written by Lukas Sacher/Camo
     public class UserInputSettings : MonoBehaviour

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace UserInput
+namespace PlayerInput
 {
     // Written by Lukas Sacher/Camo
     public static class UserInput
@@ -23,6 +23,10 @@ namespace UserInput
         // menus
         public static Action toggleInventory;
 
+        // handy
+        public static Action onInputStart;
+        public static Action onInputCompleted;
+
         public static void Setup()
 		{
             inputSettings = UserInputSettings.current;
@@ -36,13 +40,17 @@ namespace UserInput
                 throw new Exception("The UserInput is not setup! Make sure there is a game object with the UserInputSettings script");
 			}
 
+            onInputStart?.Invoke();
+
             MovementInput();
             PickUpInput();
             MenuInput();
+
+            onInputCompleted?.Invoke();
 		}
 
-		#region InputFuncs
-		static void MovementInput()
+        #region InputFuncs
+        static void MovementInput()
 		{
 			if (Input.GetKey(inputSettings.up))
 			{
