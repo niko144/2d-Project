@@ -10,8 +10,8 @@ namespace UserInput
         public static UserInputSettings current = null;
 
 		// movement
-		public KeyCode forward;
-		public KeyCode backwards;
+		public KeyCode up;
+		public KeyCode down;
 		public KeyCode left;
 		public KeyCode right;
 		[Space(10f)] // pickup

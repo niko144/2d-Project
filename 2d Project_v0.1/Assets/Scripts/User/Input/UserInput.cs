@@ -11,8 +11,8 @@ namespace UserInput
         static UserInputSettings inputSettings;
 
         // movement
-        public static Action moveForward;
-        public static Action moveBackwards;
+        public static Action moveUp;
+        public static Action moveDown;
         public static Action moveLeft;
         public static Action moveRight;
 
@@ -44,13 +44,13 @@ namespace UserInput
 		#region InputFuncs
 		static void MovementInput()
 		{
-			if (Input.GetKey(inputSettings.forward))
+			if (Input.GetKey(inputSettings.up))
 			{
-                moveForward?.Invoke();
+                moveUp?.Invoke();
 			}
-            if (Input.GetKey(inputSettings.backwards))
+            if (Input.GetKey(inputSettings.down))
             {
-                moveBackwards?.Invoke();
+                moveDown?.Invoke();
             }
             if (Input.GetKey(inputSettings.left))
             {
