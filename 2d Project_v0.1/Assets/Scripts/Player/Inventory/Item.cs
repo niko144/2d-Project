@@ -3,6 +3,7 @@
 namespace PlayerInventory
 {
     // Written by Lukas Sacher / Camo
+    [CreateAssetMenu(fileName = "NewItem", menuName = "Item")]
     public class Item : ScriptableObject
     {
         public string itemName;

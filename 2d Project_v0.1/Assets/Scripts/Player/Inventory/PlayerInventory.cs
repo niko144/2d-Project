@@ -39,7 +39,7 @@ namespace PlayerInventory
 			}
 			else if (!inventoryIsFull)
 			{
-
+				AddStackToInventory(stack);
 				return true;
 			}
 			else
@@ -50,12 +50,50 @@ namespace PlayerInventory
 		#region AddStackFunctions_ForCleanCode
 		void AddStackToHotbar(ItemStack stack)
 		{
+			int firstEmptySlot = -1;
+
 			for (int i = 0; i < hotbar.Length; i++)
 			{
+				if(hotbar[i] == null)
+				{
+					if(firstEmptySlot < 0) firstEmptySlot = i;
+					continue;
+				}
+
 				if (hotbar[i].itemId == stack.itemId)
 				{
-
+					hotbar[i].AddItems(stack.size);
+					return;
 				}
+			}
+
+			if(firstEmptySlot > -1)
+			{
+				hotbar[firstEmptySlot] = new ItemStack(stack.itemId, stack.size);
+			}
+		}
+		void AddStackToInventory(ItemStack stack)
+		{
+			int firstEmptySlot = -1;
+
+			for (int i = 0; i < inventory.Length; i++)
+			{
+				if (inventory[i] == null)
+				{
+					if (firstEmptySlot < 0) firstEmptySlot = i;
+					break;
+				}
+
+				if (inventory[i].itemId == stack.itemId)
+				{
+					inventory[i].AddItems(stack.size);
+					return;
+				}
+			}
+
+			if (firstEmptySlot > -1)
+			{
+				inventory[firstEmptySlot] = new ItemStack(stack.itemId, stack.size);
 			}
 		}
 		#endregion
@@ -86,6 +124,20 @@ namespace PlayerInventory
 		{
 			this.size = size;
 			this.itemId = itemId;
+		}
+
+		/// <summary>
+		/// Adds the amount to the size
+		/// </summary>
+		/// <returns>returns the amount that's left when the </returns>
+		public int AddItems(int amount)
+		{
+			size += amount;
+
+			//Clamp size to maxStackSize
+			//return size - maxStackSizes
+
+			return 0;
 		}
 	}
 }
