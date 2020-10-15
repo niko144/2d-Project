@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Electromagnet
   m_EditorClassIdentifier: 
   itemName: Electromagnet
-  stackSize: 16
+  stackSize: 4
   sprite: {fileID: 0}

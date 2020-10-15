@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: OrganicCrystals
   m_EditorClassIdentifier: 
   itemName: OrganicCrystals
-  stackSize: 16
+  stackSize: 24
   sprite: {fileID: 0}

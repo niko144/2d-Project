@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Bullet
   m_EditorClassIdentifier: 
   itemName: Bullet
-  stackSize: 16
+  stackSize: 264
   sprite: {fileID: 0}

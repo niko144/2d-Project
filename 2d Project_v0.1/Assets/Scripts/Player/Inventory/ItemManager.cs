@@ -50,5 +50,27 @@ namespace PlayerInventory
 
 			return n;
 		}
+		public static string GetIdByName(string name)
+		{
+			foreach (Item item in items)
+			{
+				if(GetNameById(item.GetItemId()) == name)
+				{
+					return item.GetItemId();
+				}
+			}
+			throw new System.Exception($"Couldn't find item with name: '{name}'!");
+		}
+		public static Item GetItemById(string itemId)
+		{
+			foreach (Item item in items)
+			{
+				if(item.GetItemId() == itemId)
+				{
+					return item;
+				}
+			}
+			throw new System.Exception($"Couldn't find item with id: '{itemId}'!");
+		}
 	}
 }

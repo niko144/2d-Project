@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 650f3afa8076cff47bde0f6f8ec18257, type: 3}
-  m_Name: Sulphur
+  m_Name: Sulfur
   m_EditorClassIdentifier: 
-  itemName: Sulphur
-  stackSize: 16
+  itemName: Sulfur
+  stackSize: 24
   sprite: {fileID: 0}

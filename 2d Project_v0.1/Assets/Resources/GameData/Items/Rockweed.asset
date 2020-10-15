@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Rockweed
   m_EditorClassIdentifier: 
   itemName: Rockweed
-  stackSize: 16
+  stackSize: 32
   sprite: {fileID: 0}

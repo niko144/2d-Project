@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: GunPowder
   m_EditorClassIdentifier: 
   itemName: GunPowder
-  stackSize: 16
+  stackSize: 24
   sprite: {fileID: 0}

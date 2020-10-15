@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Booster
   m_EditorClassIdentifier: 
   itemName: Booster
-  stackSize: 16
+  stackSize: 1
   sprite: {fileID: 0}

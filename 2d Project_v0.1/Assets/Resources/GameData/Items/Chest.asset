@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Chest
   m_EditorClassIdentifier: 
   itemName: Chest
-  stackSize: 16
+  stackSize: 4
   sprite: {fileID: 0}
