@@ -2,18 +2,23 @@
 using PlayerInput;
 
 namespace PlayerStats {
+
+    //Written By Muneeb Ur Rahman
     public class PlayerHealth : MonoBehaviour
     {
-        //Written By Muneeb Ur Rahman
-        [HideInInspector] public int currentHealth;
+        [HideInInspector]public int currentHealth;
         public int maxHealth;
-        [HideInInspector] public float hunger;
+        [HideInInspector]public float currentHunger;
         public int maxHunger;
-        [HideInInspector] public float thirst;
+        [HideInInspector]public float currentThirst;
         public int maxThirst;
+        [Space(15f)]
         public float hungerCoef;
         public float thirstCoef;
-        [HideInInspector]public bool isMoving;
+        [Space(5f)]
+        public float moveMultiplier = 1.2f;
+
+        bool isMoving;
         void Start()
         {
             currentHealth = maxHealth;
@@ -34,24 +39,24 @@ namespace PlayerStats {
         public void Update()
         {
             if (!isMoving) {
-                if (hunger < maxHunger)
+                if (currentHunger < maxHunger)
                 {
-                    hunger += hungerCoef * Time.deltaTime;
+                    currentHunger += hungerCoef * Time.deltaTime;
                 }
-                if (thirst < maxThirst)
+                if (currentThirst < maxThirst)
                 {
-                    thirst += thirstCoef * Time.deltaTime;
+                    currentThirst += thirstCoef * Time.deltaTime;
                 }
             }
             else
             {
-                if (hunger < maxHunger)
+                if (currentHunger < maxHunger)
                 {
-                    hunger += (hungerCoef * 1.2f) * Time.deltaTime;
+                    currentHunger += (hungerCoef * moveMultiplier) * Time.deltaTime;
                 }
-                if (thirst < maxThirst)
+                if (currentThirst < maxThirst)
                 {
-                    thirst += (thirstCoef * 1.2f) * Time.deltaTime;
+                    currentThirst += (thirstCoef * moveMultiplier) * Time.deltaTime;
                 }
             }
         }
@@ -74,18 +79,18 @@ namespace PlayerStats {
 
         public void Eat(float foodAmount)
         {
-            hunger -= foodAmount;
-            if (hunger < 0)
+            currentHunger -= foodAmount;
+            if (currentHunger < 0)
             {
-                hunger = 0;
+                currentHunger = 0;
             }
         }
         public void Drink(float waterAmount)
         {
-            thirst -= waterAmount;
-            if (thirst < 0)
+            currentThirst -= waterAmount;
+            if (currentThirst < 0)
             {
-                thirst = 0;
+                currentThirst = 0;
             }
         }
         void MoveCheck()
