@@ -12,6 +12,27 @@ namespace PlayerInventory
 
         public ItemStack[] hotbar;
         public ItemStack[] inventory;
+		ItemStack[] mergedInventory
+		{
+			get
+			{
+				ItemStack[] ret = new ItemStack[hotbarSlotAmount + inventorySlotAmount];
+				for (int i = 0; i < hotbar.Length; i++)
+				{
+					ret[i] = hotbar[i];
+				}
+				for (int i = hotbar.Length; i < hotbarSlotAmount + inventorySlotAmount; i++)
+				{
+					ret[i] = inventory[i - hotbarSlotAmount];
+				}
+
+				return ret;
+			}
+			set
+			{
+
+			}
+		}
 
 		public bool hotbarIsFull
 		{
@@ -241,6 +262,65 @@ namespace PlayerInventory
 			CleanSlots();
 		}
 
+		public bool HasStacks(ItemStack[] stacks)
+		{
+			List<ItemStack> requiredStacks = stacks.ToList<ItemStack>();
+
+			// Put the required stacks in the correct format
+			for (int i = 0; i < requiredStacks.Count; i++)
+			{
+				if (i == requiredStacks.Count - 1) break;
+
+				for (int j = i + 1; j < requiredStacks.Count; j++)
+				{
+					if (requiredStacks[i].itemId == requiredStacks[j].itemId)
+					{
+						int reqSize = requiredStacks[i].size;
+
+						requiredStacks[i].AddItems(requiredStacks[j].size);
+						requiredStacks[j].RemoveItems(ItemManager.GetStackSizeById(requiredStacks[i].itemId) - reqSize);
+
+						if (requiredStacks[j].size == 0)
+						{
+							requiredStacks.RemoveAt(j);
+							j--;
+						}
+						else
+						{
+							break;
+						}
+					}
+				}
+			}
+
+			// Check the inventory for the stacks
+			for (int i = 0; i < mergedInventory.Length; i++)
+			{
+				if (mergedInventory[i] == null) continue;
+				for (int j = 0; j < requiredStacks.Count; j++)
+				{
+					if (requiredStacks[j] == null)
+					{
+						Debug.LogWarning($"No item in the required stacks should be null. Check at index '{j}'");
+						continue;
+					}
+
+					if (mergedInventory[i].itemId == requiredStacks[j].itemId)
+					{
+						requiredStacks[j].RemoveItems(mergedInventory[i].size);
+
+						if (requiredStacks[j].size == 0)
+						{
+							requiredStacks.RemoveAt(j);
+						}
+					}
+				}
+			}
+
+			return requiredStacks.Count < 1;
+		}
+
+
 		void CleanSlots()
 		{
 			for (int i = 0; i < hotbar.Length; i++)
@@ -256,6 +336,67 @@ namespace PlayerInventory
 				{
 					inventory[i] = null;
 				}
+			}
+		}
+
+		/// <summary>
+		/// Sets the 'to' slot to the 'from' slot and the 'from' slot to null.
+		/// </summary>
+		public void SwapItemPosition(ItemInventoryPosition from, ItemInventoryPosition to)
+		{
+			if (from.generalPosition == ItemPosition.Hotbar && to.generalPosition == ItemPosition.Hotbar)
+			{
+				hotbar[to.slot] = hotbar[from.slot];
+				hotbar[from.slot] = null;
+			}
+			else if (from.generalPosition == ItemPosition.Hotbar && to.generalPosition == ItemPosition.Inventory)
+			{
+				inventory[to.slot] = hotbar[from.slot];
+				hotbar[from.slot] = null;
+			}
+			else if (from.generalPosition == ItemPosition.Inventory && to.generalPosition == ItemPosition.Hotbar)
+			{
+				hotbar[to.slot] = inventory[from.slot];
+				inventory[from.slot] = null;
+			}
+			else if (from.generalPosition == ItemPosition.Inventory && to.generalPosition == ItemPosition.Inventory)
+			{
+				inventory[to.slot] = inventory[from.slot];
+				inventory[from.slot] = null;
+			}
+		}
+		/// <summary>
+		/// Changes the items at the given positions
+		/// </summary>
+		public void SwitchItems(ItemInventoryPosition a, ItemInventoryPosition b)
+		{
+			if (a.generalPosition == ItemPosition.Hotbar && b.generalPosition == ItemPosition.Hotbar)
+			{
+				ItemStack copy = (ItemStack)hotbar[a.slot].Copy();
+
+				hotbar[a.slot] = (ItemStack)hotbar[b.slot].Copy();
+				hotbar[b.slot] = (ItemStack)copy.Copy();
+			}
+			else if (a.generalPosition == ItemPosition.Hotbar && b.generalPosition == ItemPosition.Inventory)
+			{
+				ItemStack copy = (ItemStack)hotbar[a.slot].Copy();
+
+				hotbar[a.slot] = (ItemStack)inventory[b.slot].Copy();
+				inventory[b.slot] = (ItemStack)copy.Copy();
+			}
+			else if (a.generalPosition == ItemPosition.Inventory && b.generalPosition == ItemPosition.Hotbar)
+			{
+				ItemStack copy = (ItemStack)inventory[a.slot].Copy();
+
+				inventory[a.slot] = (ItemStack)hotbar[b.slot].Copy();
+				hotbar[b.slot] = (ItemStack)copy.Copy();
+			}
+			else if (a.generalPosition == ItemPosition.Inventory && b.generalPosition == ItemPosition.Inventory)
+			{
+				ItemStack copy = (ItemStack)inventory[a.slot].Copy();
+
+				inventory[a.slot] = (ItemStack)inventory[b.slot].Copy();
+				inventory[b.slot] = (ItemStack)copy.Copy();
 			}
 		}
 
@@ -389,21 +530,33 @@ namespace PlayerInventory
 		}
     }
 
-	enum ItemPosition
+	public enum ItemPosition
 	{
 		Inventory,
 		Hotbar
 	}
 
-	class ItemInventoryPosition
+	public class ItemInventoryPosition
 	{
 		public bool isValid = false;
 		public ItemPosition generalPosition;
 		public int slot;
+
+		public ItemInventoryPosition()
+		{
+
+		}
+
+		public ItemInventoryPosition(bool valid, ItemPosition generalPos, int index)
+		{
+			isValid = valid;
+			generalPosition = generalPos;
+			slot = index;
+		}
 	}
 
 	[System.Serializable]
-    public class ItemStack
+    public class ItemStack : IListCopyable
 	{
 		public string itemId;
 		public int size;
@@ -446,6 +599,12 @@ namespace PlayerInventory
 		{
 			size -= amount;
 			size = Mathf.Clamp(size, 0, maxSize);
+		}
+
+		public IListCopyable Copy()
+		{
+			ItemStack copy = new ItemStack(itemId, size);
+			return copy;
 		}
 	}
 }
