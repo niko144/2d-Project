@@ -198,9 +198,9 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.012102108, y: -0.018160146}
   serializedVersion: 2
-  m_Radius: 0.08984659
+  m_Radius: 0.06827804
 --- !u!212 &72743101
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -702,9 +702,9 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.01844723, y: -0.02768149}
   serializedVersion: 2
-  m_Radius: 0.08984659
+  m_Radius: 0.05696967
 --- !u!212 &594913555
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -955,9 +955,9 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.015447437, y: -0.02318007}
   serializedVersion: 2
-  m_Radius: 0.08984659
+  m_Radius: 0.06231594
 --- !u!212 &1094497058
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1247,9 +1247,9 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.014237794, y: -0.021364907}
   serializedVersion: 2
-  m_Radius: 0.08984659
+  m_Radius: 0.06447178
 --- !u!114 &1576992341
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1585,7 +1585,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: -0.048451245}
   m_SpriteTilingProperty:
     border: {x: 0.049999997, y: 0.049999997, z: 0.049999997, w: 0.049999997}
     pivot: {x: 0.5, y: 0.5}
@@ -1596,7 +1596,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.1384317, y: 0.14274552}
+  m_Size: {x: 0.1384317, y: 0.045843035}
   m_EdgeRadius: 0
 --- !u!114 &2000600793
 MonoBehaviour:
@@ -1614,6 +1614,7 @@ MonoBehaviour:
   inventorySlotAmount: 30
   hotbar: []
   inventory: []
+<<<<<<< Updated upstream
 --- !u!114 &2000600794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1635,6 +1636,8 @@ MonoBehaviour:
   hungerCoef: 0.2
   thirstCoef: 0.2
   moveMultiplier: 1.2
+=======
+>>>>>>> Stashed changes
 --- !u!1 &2014505384
 GameObject:
   m_ObjectHideFlags: 0
