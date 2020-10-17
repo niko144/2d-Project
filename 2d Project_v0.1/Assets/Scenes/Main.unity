@@ -1107,6 +1107,49 @@ MonoBehaviour:
   target: {fileID: 2000600789}
   offset: {x: 0, y: 0, z: -10}
   smoothness: 3.5
+--- !u!1 &1306116530
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1306116532}
+  - component: {fileID: 1306116531}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1306116531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1306116530}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bdd3e97b08b7f44f9616dda51234b04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1306116532
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1306116530}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.5919764, y: -0.90525556, z: -12.706264}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1473691824
 GameObject:
   m_ObjectHideFlags: 0
@@ -1466,6 +1509,7 @@ GameObject:
   - component: {fileID: 2000600792}
   - component: {fileID: 2000600790}
   - component: {fileID: 2000600793}
+  - component: {fileID: 2000600794}
   m_Layer: 0
   m_Name: TestPlayer
   m_TagString: Untagged
@@ -1611,6 +1655,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hotbarSlotAmount: 6
   inventorySlotAmount: 30
+--- !u!114 &2000600794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000600787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94771ab9f1bdffe46839096b6c529c3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentHealth: 0
+  maxHealth: 100
+  hunger: 0
+  maxHunger: 50
+  thirst: 0
+  maxThirst: 50
+  hungerCoef: 0.2
+  thirstCoef: 0.2
+  isMoving: 0
 --- !u!1 &2014505384
 GameObject:
   m_ObjectHideFlags: 0
