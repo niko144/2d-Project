@@ -1,17 +1,23 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using GameItems;
+using GameItems.Location;
 
-namespace PlayerInventory
+// Written by Lukas Sacher / Camo
+
+namespace Inventory
 {
-	// Written by Lukas Sacher / Camo
-	public class PlayerInventory : MonoBehaviour
-    {
-        public int hotbarSlotAmount;
-        public int inventorySlotAmount;
+	/// <summary>
+	/// The inventory of the player. This class only contains the data. Visualizing the inventory is handled by other classes.
+	/// </summary>
+	public class PlayerInventory : EntityInventory
+	{
+		public int hotbarSlotAmount;
+		public int inventorySlotAmount;
 
-        public ItemStack[] hotbar;
-        public ItemStack[] inventory;
+		public ItemStack[] hotbar;
+		public ItemStack[] inventory;
 		ItemStack[] mergedInventory
 		{
 			get
@@ -60,10 +66,6 @@ namespace PlayerInventory
 		private void Start()
 		{
 			SetupInventory();
-			for (int i = 0; i < 5; i++)
-			{
-				AddItem(ItemManager.GetIdByName("IronSword"));
-			}
 		}
 
 		void SetupInventory()
@@ -76,7 +78,7 @@ namespace PlayerInventory
 		/// Adds a stack of items to the inventory.
 		/// </summary>
 		/// <returns>Returns the overflowed item amount.</returns>
-		public int AddStack(ItemStack stack)
+		public override int AddStack(ItemStack stack)
 		{
 			int overflow;
 
@@ -100,9 +102,9 @@ namespace PlayerInventory
 
 			for (int i = 0; i < hotbar.Length; i++)
 			{
-				if(hotbar[i] == null)
+				if (hotbar[i] == null)
 				{
-					if(overflow > 0)
+					if (overflow > 0)
 					{
 						hotbar[i] = new ItemStack(stack.itemId, overflow);
 						overflow = 0;
@@ -122,17 +124,16 @@ namespace PlayerInventory
 				}
 			}
 
-			if(firstEmptySlot > -1 && overflow < 0)
+			if (firstEmptySlot > -1 && overflow < 0)
 			{
 				hotbar[firstEmptySlot] = new ItemStack(stack.itemId, stack.size);
 				return 0;
 			}
-
-			if(overflow > 0 && !inventoryIsFull)
+			if (overflow > 0 && !inventoryIsFull)
 			{
 				overflow = AddStackToInventory(new ItemStack(stack.itemId, overflow));
 			}
-			else if(overflow < 0)
+			else if (overflow < 0)
 			{
 				AddStackToInventory(stack);
 			}
@@ -148,7 +149,7 @@ namespace PlayerInventory
 			{
 				if (inventory[i] == null)
 				{
-					if(overflow > 0)
+					if (overflow > 0)
 					{
 						inventory[i] = new ItemStack(stack.itemId, overflow);
 						overflow = 0;
@@ -178,9 +179,9 @@ namespace PlayerInventory
 		/// Adds an item to the inventory.
 		/// </summary>
 		/// <returns>Returns if the item could be added.</returns>
-		public bool AddItem(Item item)
+		public override bool AddItem(Item item)
 		{
-			if(hotbarIsFull && inventoryIsFull)
+			if (hotbarIsFull && inventoryIsFull)
 			{
 				return false;
 			}
@@ -190,7 +191,7 @@ namespace PlayerInventory
 				return true;
 			}
 		}
-		public bool AddItem(string itemId)
+		public override bool AddItem(string itemId)
 		{
 			Item item = ItemManager.GetItemById(itemId);
 			if (hotbarIsFull && inventoryIsFull)
@@ -206,10 +207,10 @@ namespace PlayerInventory
 
 		public void RemoveItemOfType(string itemId)
 		{
-			ItemInventoryPosition itemPosition = SearchForItem(itemId);
-			if (itemPosition.isValid)
+			ItemLocation itemPosition = SearchForItem(itemId);
+			if (itemPosition.hasItem)
 			{
-				if(itemPosition.generalPosition == ItemPosition.Hotbar)
+				if (itemPosition.generalPosition == ItemPosition.Hotbar)
 				{
 					hotbar[itemPosition.slot].RemoveItems(1);
 				}
@@ -220,16 +221,16 @@ namespace PlayerInventory
 			}
 			CleanSlots();
 		}
-		public void RemoveItemOfType(string itemId, int amount)
+		public override void RemoveItemOfType(string itemId, int amount)
 		{
-			ItemInventoryPosition[] itemPositions = SearchForItems(itemId);
+			ItemLocation[] itemPositions = SearchForItems(itemId);
 			int maxStackSize = ItemManager.GetStackSizeById(itemId);
 			int stacks = (int)((float)amount / (float)maxStackSize);
 			int rest = amount - stacks * maxStackSize;
 
-			foreach (ItemInventoryPosition pos in itemPositions)
+			foreach (ItemLocation pos in itemPositions)
 			{
-				if (!pos.isValid) continue;
+				if (!pos.hasItem) continue;
 
 				if (pos.generalPosition == ItemPosition.Hotbar)
 				{
@@ -238,7 +239,7 @@ namespace PlayerInventory
 						hotbar[pos.slot].RemoveItems(maxStackSize);
 						stacks--;
 					}
-					else 
+					else
 					{
 						hotbar[pos.slot].RemoveItems(rest);
 						break;
@@ -262,7 +263,7 @@ namespace PlayerInventory
 			CleanSlots();
 		}
 
-		public bool HasStacks(ItemStack[] stacks)
+		public override bool HasStacks(ItemStack[] stacks)
 		{
 			List<ItemStack> requiredStacks = stacks.ToList<ItemStack>();
 
@@ -325,7 +326,7 @@ namespace PlayerInventory
 		{
 			for (int i = 0; i < hotbar.Length; i++)
 			{
-				if(hotbar[i] != null && hotbar[i].size <= 0)
+				if (hotbar[i] != null && hotbar[i].size <= 0)
 				{
 					hotbar[i] = null;
 				}
@@ -342,7 +343,7 @@ namespace PlayerInventory
 		/// <summary>
 		/// Sets the 'to' slot to the 'from' slot and the 'from' slot to null.
 		/// </summary>
-		public void SwapItemPosition(ItemInventoryPosition from, ItemInventoryPosition to)
+		public void SwapItemPosition(ItemLocation from, ItemLocation to)
 		{
 			if (from.generalPosition == ItemPosition.Hotbar && to.generalPosition == ItemPosition.Hotbar)
 			{
@@ -368,7 +369,7 @@ namespace PlayerInventory
 		/// <summary>
 		/// Changes the items at the given positions
 		/// </summary>
-		public void SwitchItems(ItemInventoryPosition a, ItemInventoryPosition b)
+		public void SwitchItems(ItemLocation a, ItemLocation b)
 		{
 			if (a.generalPosition == ItemPosition.Hotbar && b.generalPosition == ItemPosition.Hotbar)
 			{
@@ -400,7 +401,7 @@ namespace PlayerInventory
 			}
 		}
 
-		ItemInventoryPosition SearchForItem(string itemId)
+		ItemLocation SearchForItem(string itemId)
 		{
 			int i = 0;
 			foreach (ItemStack item in hotbar)
@@ -412,11 +413,11 @@ namespace PlayerInventory
 				}
 				if (item.itemId == itemId)
 				{
-					ItemInventoryPosition pos = new ItemInventoryPosition
+					ItemLocation pos = new ItemLocation
 					{
 						generalPosition = ItemPosition.Hotbar,
 						slot = i,
-						isValid = true
+						hasItem = true
 					};
 
 					return pos;
@@ -434,11 +435,11 @@ namespace PlayerInventory
 				}
 				if (item.itemId == itemId)
 				{
-					ItemInventoryPosition pos = new ItemInventoryPosition
+					ItemLocation pos = new ItemLocation
 					{
 						generalPosition = ItemPosition.Inventory,
 						slot = i,
-						isValid = true
+						hasItem = true
 					};
 
 					return pos;
@@ -446,30 +447,30 @@ namespace PlayerInventory
 				i++;
 			}
 
-			return new ItemInventoryPosition
+			return new ItemLocation
 			{
-				isValid = false
+				hasItem = false
 			};
 		}
-		ItemInventoryPosition[] SearchForItems(string itemId)
+		ItemLocation[] SearchForItems(string itemId)
 		{
-			List<ItemInventoryPosition> positions = new List<ItemInventoryPosition>();
+			List<ItemLocation> positions = new List<ItemLocation>();
 
 			int i = 0;
 			foreach (ItemStack item in hotbar)
 			{
-				if(item == null)
+				if (item == null)
 				{
 					i++;
 					continue;
 				}
 				if (item.itemId == itemId)
 				{
-					ItemInventoryPosition pos = new ItemInventoryPosition
+					ItemLocation pos = new ItemLocation
 					{
 						generalPosition = ItemPosition.Hotbar,
 						slot = i,
-						isValid = true
+						hasItem = true
 					};
 
 					positions.Add(pos);
@@ -489,11 +490,11 @@ namespace PlayerInventory
 				}
 				if (item.itemId == itemId)
 				{
-					ItemInventoryPosition pos = new ItemInventoryPosition
+					ItemLocation pos = new ItemLocation
 					{
 						generalPosition = ItemPosition.Inventory,
 						slot = i,
-						isValid = true
+						hasItem = true
 					};
 
 					positions.Add(pos);
@@ -509,7 +510,7 @@ namespace PlayerInventory
 			foreach (ItemStack stack in hotbar)
 			{
 				if (stack == null) return false;
-				if(stack.size < stack.maxSize)
+				if (stack.size < stack.maxSize)
 				{
 					return false;
 				}
@@ -527,84 +528,6 @@ namespace PlayerInventory
 				}
 			}
 			return true;
-		}
-    }
-
-	public enum ItemPosition
-	{
-		Inventory,
-		Hotbar
-	}
-
-	public class ItemInventoryPosition
-	{
-		public bool isValid = false;
-		public ItemPosition generalPosition;
-		public int slot;
-
-		public ItemInventoryPosition()
-		{
-
-		}
-
-		public ItemInventoryPosition(bool valid, ItemPosition generalPos, int index)
-		{
-			isValid = valid;
-			generalPosition = generalPos;
-			slot = index;
-		}
-	}
-
-	[System.Serializable]
-    public class ItemStack : IListCopyable
-	{
-		public string itemId;
-		public int size;
-		public int maxSize;
-
-		public ItemStack(string itemId, int size)
-		{
-			this.size = size;
-			this.itemId = itemId;
-			maxSize = ItemManager.GetStackSizeById(itemId);
-
-			if(size > maxSize)
-			{
-				Debug.LogWarning($"Trying to create an item stack bigger then the maximum stack size. {itemId}");
-				this.size = maxSize;
-			}
-			else if (size <= 0)
-			{
-				Debug.LogWarning($"Trying to create an item stack with a negative stack size. {itemId}");
-				this.size = 1;
-			}
-		}
-
-		/// <summary>
-		/// Adds the amount to the size
-		/// </summary>
-		/// <returns>returns the amount that's left when the </returns>
-		public int AddItems(int amount)
-		{
-			size += amount;
-
-			int overflow = Mathf.Clamp( size - maxSize, 0, maxSize);
-			size = Mathf.Clamp(size, 0, maxSize);
-			return overflow;
-		}
-		/// <summary>
-		/// Removes the amount from the size
-		/// </summary>
-		public void RemoveItems(int amount)
-		{
-			size -= amount;
-			size = Mathf.Clamp(size, 0, maxSize);
-		}
-
-		public IListCopyable Copy()
-		{
-			ItemStack copy = new ItemStack(itemId, size);
-			return copy;
 		}
 	}
 }

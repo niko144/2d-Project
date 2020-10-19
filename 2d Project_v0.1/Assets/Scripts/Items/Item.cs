@@ -1,8 +1,12 @@
 ﻿using UnityEngine;
 
-namespace PlayerInventory
+namespace GameItems
 {
     // Written by Lukas Sacher / Camo
+
+    /// <summary>
+    /// Item data as scriptable object.
+    /// </summary>
     [CreateAssetMenu(fileName = "NewItem", menuName = "Item")]
     public class Item : ScriptableObject
     {

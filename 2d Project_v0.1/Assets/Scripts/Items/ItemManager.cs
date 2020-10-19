@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using GameLoad;
 
-namespace PlayerInventory
+namespace GameItems
 {
 	// Written by Lukas Sacher / Camo
+
+	/// <summary>
+	/// It manages the items and provides handy functions. Also has all existing items as an array.
+	/// </summary>
 	public static class ItemManager
 	{
 		const int idNameStartIndex = 11;

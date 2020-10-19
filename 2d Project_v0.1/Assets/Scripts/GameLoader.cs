@@ -6,6 +6,10 @@ using UnityEngine;
 namespace GameLoad
 {
     // Written by Lukas Sacher / Camo
+
+    /// <summary>
+    /// Handles the game loading scene. Functions with the 'ExecuteOnGameLoad' attribute will be executed while the game loads.
+    /// </summary>
     public class GameLoader : MonoBehaviour
     {
 
