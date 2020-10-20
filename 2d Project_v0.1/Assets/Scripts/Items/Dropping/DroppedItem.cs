@@ -20,10 +20,13 @@ namespace GameItems.Drop
 		public LayerMask whatCanPickUp;
 		public Animator anim;
 
+		float dropT = 0f;
+		Vector2 targetPos = Vector2.zero;
+		float dropForce = 0f;
+
 		private void Start()
 		{
 			anim = GetComponent<Animator>();
-			data = new ItemStack(ItemManager.GetIdByName("Battery"), 2);
 		}
 
 		Collider2D[] nearEntitys;
@@ -31,16 +34,26 @@ namespace GameItems.Drop
 		{
 			nearEntitys = Physics2D.OverlapCircleAll(transform.position, range, whatCanPickUp);
 			anim.SetBool("InRange", nearEntitys.Length > 0);
-		}
 
+			if (dropT > 1f) return;
+
+			transform.position = Vector2.Lerp(transform.position, targetPos, dropT);
+
+			dropT += Time.deltaTime * 0.05f * dropForce;
+		}
 		private void OnEnable()
 		{
-			Debug.Log(EntityEvents.current.name);
 			(EntityEvents.current.events[typeof(EntityPickUpEvents)] as EntityPickUpEvents).entityPickUp += TryCollectBy;
 		}
 		private void OnDisable()
 		{
 			(EntityEvents.current.events[typeof(EntityPickUpEvents)] as EntityPickUpEvents).entityPickUp -= TryCollectBy;
+		}
+
+		public void DropAnim(Vector2 targetPos, float force)
+		{
+			dropForce = force;
+			this.targetPos = targetPos;
 		}
 
 		public void CopyFrom(ItemStack from)
@@ -84,6 +97,7 @@ namespace GameItems.Drop
 
 		public void TryCollectBy(GameObject entity)
 		{
+			if (nearEntitys == null) return;
 			foreach (Collider2D col in nearEntitys)
 			{
 				if (entity != col.gameObject) continue;

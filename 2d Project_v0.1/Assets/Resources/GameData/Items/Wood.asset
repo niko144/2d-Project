@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Wood
   stackSize: 16
-  sprite: {fileID: 0}
+  sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}

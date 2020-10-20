@@ -77,7 +77,6 @@ namespace Events.Entitys
 
 		public void EntityPickUp(GameObject entity)
 		{
-			Debug.Log("PickUp");
 			entityPickUp?.Invoke(entity);
 		}
 

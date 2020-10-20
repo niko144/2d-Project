@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
-using Random = UnityEngine.Random;
 using GameItems;
 using GameItems.Location;
+using Inventory;
+using UnityEngine;
 
 // Written by Lukas Sacher / Camo
 
-namespace Inventory
+namespace Player.Inventory
 {
 	/// <summary>
 	/// The inventory of the player. This class only contains the data. Visualizing the inventory is handled by other classes.
@@ -16,8 +16,8 @@ namespace Inventory
 		public int hotbarSlotAmount;
 		public int inventorySlotAmount;
 
-		public ItemStack[] hotbar;
-		public ItemStack[] inventory;
+		private ItemStack[] hotbar;
+		private ItemStack[] inventory;
 		ItemStack[] mergedInventory
 		{
 			get
@@ -34,41 +34,22 @@ namespace Inventory
 
 				return ret;
 			}
-			set
-			{
-
-			}
 		}
 
-		public bool hotbarIsFull
-		{
-			get
-			{
-				return CheckFullHotbar();
-			}
-			private set
-			{
+		private bool hotbarIsFull => CheckFullHotbar();
 
-			}
-		}
-		public bool inventoryIsFull
-		{
-			get
-			{
-				return CheckFullInventoy();
-			}
-			private set
-			{
-
-			}
-		}
+		private bool inventoryIsFull => CheckFullInventoy();
 
 		private void Start()
 		{
 			SetupInventory();
+			ItemDropManager.current.DropItemStack(transform.position, new ItemStack(ItemManager.GetIdByName("Wood"), 5));
 		}
-
-		void SetupInventory()
+		private void Update()
+		{
+			ItemDropManager.current.DropItemStack(transform.position, new ItemStack(ItemManager.GetIdByName("Wood"), 5));
+		}
+		private void SetupInventory()
 		{
 			hotbar = new ItemStack[hotbarSlotAmount];
 			inventory = new ItemStack[inventorySlotAmount];
@@ -140,7 +121,8 @@ namespace Inventory
 
 			return overflow;
 		}
-		int AddStackToInventory(ItemStack stack)
+
+		private int AddStackToInventory(ItemStack stack)
 		{
 			int firstEmptySlot = -1;
 			int overflow = -1;
@@ -322,7 +304,7 @@ namespace Inventory
 		}
 
 
-		void CleanSlots()
+		private void CleanSlots()
 		{
 			for (int i = 0; i < hotbar.Length; i++)
 			{
@@ -505,7 +487,7 @@ namespace Inventory
 			return positions.ToArray();
 		}
 
-		bool CheckFullHotbar()
+		private bool CheckFullHotbar()
 		{
 			foreach (ItemStack stack in hotbar)
 			{
@@ -517,7 +499,7 @@ namespace Inventory
 			}
 			return true;
 		}
-		bool CheckFullInventoy()
+		private bool CheckFullInventoy()
 		{
 			foreach (ItemStack stack in inventory)
 			{
