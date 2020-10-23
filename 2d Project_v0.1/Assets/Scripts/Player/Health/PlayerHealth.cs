@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using PlayerInput;
+using Events.Player;
 
 namespace PlayerStats {
 
     //Written By Muneeb Ur Rahman
     public class PlayerHealth : MonoBehaviour
     {
-        [HideInInspector]public int currentHealth;
+        public int currentHealth;
         public int maxHealth;
         [HideInInspector]public float currentHunger;
         public int maxHunger;
@@ -17,9 +18,10 @@ namespace PlayerStats {
         public float thirstCoef;
         [Space(5f)]
         public float moveMultiplier = 1.2f;
-
         bool isMoving;
-        void Start()
+
+        
+        private void Awake()
         {
             currentHealth = maxHealth;
             UserInput.moveUp += MoveCheck;
@@ -27,6 +29,7 @@ namespace PlayerStats {
             UserInput.moveLeft += MoveCheck;
             UserInput.moveRight += MoveCheck;
             UserInput.onInputStart += ClearInput;
+
         }
         private void OnDestroy()
         {
@@ -62,6 +65,7 @@ namespace PlayerStats {
         }
         public void Heal(int healAmount)
         {
+            (PlayerEvents.current.events[typeof(HealthEvents)] as HealthEvents).InvokeOnHeal(healAmount);
             currentHealth += healAmount;
             if (currentHealth < maxHealth)
             {
@@ -70,6 +74,7 @@ namespace PlayerStats {
         }
         public void Damage(int damageAmount)
         {
+            (PlayerEvents.current.events[typeof(HealthEvents)] as HealthEvents).InvokeOnDamage(damageAmount);
             currentHealth -= damageAmount;
             if (currentHealth < 0)
             {
@@ -79,6 +84,7 @@ namespace PlayerStats {
 
         public void Eat(float foodAmount)
         {
+            (PlayerEvents.current.events[typeof(RequirementsEvents)] as RequirementsEvents).InvokeOnEat(foodAmount);
             currentHunger -= foodAmount;
             if (currentHunger < 0)
             {
@@ -87,6 +93,7 @@ namespace PlayerStats {
         }
         public void Drink(float waterAmount)
         {
+            (PlayerEvents.current.events[typeof(RequirementsEvents)] as RequirementsEvents).InvokeOnDrink(waterAmount);
             currentThirst -= waterAmount;
             if (currentThirst < 0)
             {
