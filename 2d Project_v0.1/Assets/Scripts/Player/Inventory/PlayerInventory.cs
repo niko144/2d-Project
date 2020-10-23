@@ -43,11 +43,17 @@ namespace Player.Inventory
 		private void Start()
 		{
 			SetupInventory();
-			ItemDropManager.current.DropItemStack(transform.position, new ItemStack(ItemManager.GetIdByName("Wood"), 5));
+			if (ItemDropManager.current != null)
+			{
+				ItemDropManager.current.DropItemStack(transform.position, new ItemStack(ItemManager.GetIdByName("Wood"), 5));
+			}
 		}
 		private void Update()
 		{
-			ItemDropManager.current.DropItemStack(transform.position, new ItemStack(ItemManager.GetIdByName("Wood"), 5));
+			if (ItemDropManager.current != null)
+			{
+				ItemDropManager.current.DropItemStack(transform.position, new ItemStack(ItemManager.GetIdByName("Wood"), 5));
+			}
 		}
 		private void SetupInventory()
 		{

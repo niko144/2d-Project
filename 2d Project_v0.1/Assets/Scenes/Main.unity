@@ -1612,8 +1612,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hotbarSlotAmount: 6
   inventorySlotAmount: 30
-  hotbar: []
-  inventory: []
 --- !u!114 &2000600794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1628,9 +1626,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentHealth: 0
   maxHealth: 100
-  hunger: 0
+  currentHunger: 0
   maxHunger: 50
-  thirst: 0
+  currentThirst: 0
   maxThirst: 50
   hungerCoef: 0.2
   thirstCoef: 0.2
