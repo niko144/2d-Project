@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using GameItems;
 using GameItems.Location;
-using Inventory;
 using UnityEngine;
 
 // Written by Lukas Sacher / Camo
 
-namespace Player.Inventory
+namespace Inventory.Player
 {
 	/// <summary>
 	/// The inventory of the player. This class only contains the data. Visualizing the inventory is handled by other classes.
@@ -16,8 +17,8 @@ namespace Player.Inventory
 		public int hotbarSlotAmount;
 		public int inventorySlotAmount;
 
-		private ItemStack[] hotbar;
-		private ItemStack[] inventory;
+		public ItemStack[] hotbar;
+		public ItemStack[] inventory;
 		ItemStack[] mergedInventory
 		{
 			get
@@ -37,18 +38,35 @@ namespace Player.Inventory
 		}
 
 		private bool hotbarIsFull => CheckFullHotbar();
-
 		private bool inventoryIsFull => CheckFullInventoy();
 
-		private void Start()
+		public event Action<ItemStack, ItemLocation> onSlotUpdate;
+
+		private void Awake()
 		{
 			SetupInventory();
-			ItemDropManager.current.DropItemStack(transform.position, new ItemStack(ItemManager.GetIdByName("Wood"), 5));
 		}
-		private void Update()
+		private void Start()
 		{
-			ItemDropManager.current.DropItemStack(transform.position, new ItemStack(ItemManager.GetIdByName("Wood"), 5));
+			StartCoroutine(TestAddingItems());
 		}
+
+		IEnumerator TestAddingItems()
+		{
+			AddStack(new ItemStack(ItemManager.GetIdByName("Wood"), 13));
+			yield return new WaitForSeconds(.5f);
+			AddStack(new ItemStack(ItemManager.GetIdByName("Wood"), 13));
+			yield return new WaitForSeconds(.5f);
+			AddStack(new ItemStack(ItemManager.GetIdByName("Titanium"), 10));
+			yield return new WaitForSeconds(.5f);
+			AddStack(new ItemStack(ItemManager.GetIdByName("Iron"), 1));
+			yield return new WaitForSeconds(.5f);
+			AddStack(new ItemStack(ItemManager.GetIdByName("Spring"), 5));
+			yield return new WaitForSeconds(.5f);
+			AddStack(new ItemStack(ItemManager.GetIdByName("Wire"), 2));
+			yield return new WaitForSeconds(.5f);
+		}
+
 		private void SetupInventory()
 		{
 			hotbar = new ItemStack[hotbarSlotAmount];
@@ -88,6 +106,7 @@ namespace Player.Inventory
 					if (overflow > 0)
 					{
 						hotbar[i] = new ItemStack(stack.itemId, overflow);
+						onSlotUpdate?.Invoke(hotbar[i], new ItemLocation(true, ItemPosition.Hotbar, i));
 						overflow = 0;
 						break;
 					}
@@ -102,12 +121,14 @@ namespace Player.Inventory
 				if (hotbar[i].itemId == stack.itemId)
 				{
 					overflow = hotbar[i].AddItems(stack.size);
+					onSlotUpdate?.Invoke(hotbar[i], new ItemLocation(true, ItemPosition.Hotbar, i));
 				}
 			}
 
 			if (firstEmptySlot > -1 && overflow < 0)
 			{
 				hotbar[firstEmptySlot] = new ItemStack(stack.itemId, stack.size);
+				onSlotUpdate?.Invoke(hotbar[firstEmptySlot], new ItemLocation(true, ItemPosition.Hotbar, firstEmptySlot));
 				return 0;
 			}
 			if (overflow > 0 && !inventoryIsFull)
@@ -134,6 +155,7 @@ namespace Player.Inventory
 					if (overflow > 0)
 					{
 						inventory[i] = new ItemStack(stack.itemId, overflow);
+						onSlotUpdate?.Invoke(inventory[i], new ItemLocation(true, ItemPosition.Inventory, i));
 						overflow = 0;
 						break;
 					}
@@ -145,12 +167,14 @@ namespace Player.Inventory
 				if (inventory[i].itemId == stack.itemId)
 				{
 					overflow = inventory[i].AddItems(stack.size);
+					onSlotUpdate?.Invoke(inventory[i], new ItemLocation(true, ItemPosition.Inventory, i));
 				}
 			}
 
 			if (firstEmptySlot > -1 && overflow < 0)
 			{
 				inventory[firstEmptySlot] = new ItemStack(stack.itemId, stack.size);
+				onSlotUpdate?.Invoke(inventory[firstEmptySlot], new ItemLocation(true, ItemPosition.Inventory, firstEmptySlot));
 				return 0;
 			}
 
@@ -195,10 +219,12 @@ namespace Player.Inventory
 				if (itemPosition.generalPosition == ItemPosition.Hotbar)
 				{
 					hotbar[itemPosition.slot].RemoveItems(1);
+					onSlotUpdate?.Invoke(hotbar[itemPosition.slot], new ItemLocation(true, ItemPosition.Hotbar, itemPosition.slot));
 				}
 				else if (itemPosition.generalPosition == ItemPosition.Hotbar)
 				{
 					inventory[itemPosition.slot].RemoveItems(1);
+					onSlotUpdate?.Invoke(inventory[itemPosition.slot], new ItemLocation(true, ItemPosition.Inventory, itemPosition.slot));
 				}
 			}
 			CleanSlots();
@@ -210,33 +236,37 @@ namespace Player.Inventory
 			int stacks = (int)((float)amount / (float)maxStackSize);
 			int rest = amount - stacks * maxStackSize;
 
-			foreach (ItemLocation pos in itemPositions)
+			for (int i = itemPositions.Length - 1; i >= 0; i--)
 			{
-				if (!pos.hasItem) continue;
+				if (!itemPositions[i].hasItem) continue;
 
-				if (pos.generalPosition == ItemPosition.Hotbar)
+				if (itemPositions[i].generalPosition == ItemPosition.Hotbar)
 				{
 					if (stacks > 0)
 					{
-						hotbar[pos.slot].RemoveItems(maxStackSize);
+						hotbar[itemPositions[i].slot].RemoveItems(maxStackSize);
+						onSlotUpdate?.Invoke(hotbar[itemPositions[i].slot], new ItemLocation(true, ItemPosition.Hotbar, itemPositions[i].slot));
 						stacks--;
 					}
 					else
 					{
-						hotbar[pos.slot].RemoveItems(rest);
+						hotbar[itemPositions[i].slot].RemoveItems(rest);
+						onSlotUpdate?.Invoke(hotbar[itemPositions[i].slot], new ItemLocation(true, ItemPosition.Hotbar, itemPositions[i].slot));
 						break;
 					}
 				}
-				else if (pos.generalPosition == ItemPosition.Inventory)
+				else if (itemPositions[i].generalPosition == ItemPosition.Inventory)
 				{
 					if (stacks > 0)
 					{
-						inventory[pos.slot].RemoveItems(maxStackSize);
+						inventory[itemPositions[i].slot].RemoveItems(maxStackSize);
+						onSlotUpdate?.Invoke(inventory[itemPositions[i].slot], new ItemLocation(true, ItemPosition.Inventory, itemPositions[i].slot));
 						stacks--;
 					}
 					else
 					{
-						inventory[pos.slot].RemoveItems(rest);
+						inventory[itemPositions[i].slot].RemoveItems(rest);
+						onSlotUpdate?.Invoke(inventory[itemPositions[i].slot], new ItemLocation(true, ItemPosition.Inventory, itemPositions[i].slot));
 						break;
 					}
 				}
@@ -303,7 +333,6 @@ namespace Player.Inventory
 			return requiredStacks.Count < 1;
 		}
 
-
 		private void CleanSlots()
 		{
 			for (int i = 0; i < hotbar.Length; i++)
@@ -331,21 +360,29 @@ namespace Player.Inventory
 			{
 				hotbar[to.slot] = hotbar[from.slot];
 				hotbar[from.slot] = null;
+				onSlotUpdate?.Invoke(inventory[from.slot], new ItemLocation(true, ItemPosition.Hotbar, from.slot));
+				onSlotUpdate?.Invoke(inventory[to.slot], new ItemLocation(true, ItemPosition.Hotbar, to.slot));
 			}
 			else if (from.generalPosition == ItemPosition.Hotbar && to.generalPosition == ItemPosition.Inventory)
 			{
 				inventory[to.slot] = hotbar[from.slot];
 				hotbar[from.slot] = null;
+				onSlotUpdate?.Invoke(inventory[from.slot], new ItemLocation(true, ItemPosition.Hotbar, from.slot));
+				onSlotUpdate?.Invoke(inventory[to.slot], new ItemLocation(true, ItemPosition.Inventory, to.slot));
 			}
 			else if (from.generalPosition == ItemPosition.Inventory && to.generalPosition == ItemPosition.Hotbar)
 			{
 				hotbar[to.slot] = inventory[from.slot];
 				inventory[from.slot] = null;
+				onSlotUpdate?.Invoke(inventory[from.slot], new ItemLocation(true, ItemPosition.Inventory, from.slot));
+				onSlotUpdate?.Invoke(inventory[to.slot], new ItemLocation(true, ItemPosition.Hotbar, to.slot));
 			}
 			else if (from.generalPosition == ItemPosition.Inventory && to.generalPosition == ItemPosition.Inventory)
 			{
 				inventory[to.slot] = inventory[from.slot];
 				inventory[from.slot] = null;
+				onSlotUpdate?.Invoke(inventory[from.slot], new ItemLocation(true, ItemPosition.Inventory, from.slot));
+				onSlotUpdate?.Invoke(inventory[to.slot], new ItemLocation(true, ItemPosition.Inventory, to.slot));
 			}
 		}
 		/// <summary>
@@ -359,6 +396,8 @@ namespace Player.Inventory
 
 				hotbar[a.slot] = (ItemStack)hotbar[b.slot].Copy();
 				hotbar[b.slot] = (ItemStack)copy.Copy();
+				onSlotUpdate?.Invoke(inventory[a.slot], new ItemLocation(true, ItemPosition.Hotbar, a.slot));
+				onSlotUpdate?.Invoke(inventory[b.slot], new ItemLocation(true, ItemPosition.Hotbar, b.slot));
 			}
 			else if (a.generalPosition == ItemPosition.Hotbar && b.generalPosition == ItemPosition.Inventory)
 			{
@@ -366,6 +405,8 @@ namespace Player.Inventory
 
 				hotbar[a.slot] = (ItemStack)inventory[b.slot].Copy();
 				inventory[b.slot] = (ItemStack)copy.Copy();
+				onSlotUpdate?.Invoke(inventory[a.slot], new ItemLocation(true, ItemPosition.Hotbar, a.slot));
+				onSlotUpdate?.Invoke(inventory[b.slot], new ItemLocation(true, ItemPosition.Inventory, b.slot));
 			}
 			else if (a.generalPosition == ItemPosition.Inventory && b.generalPosition == ItemPosition.Hotbar)
 			{
@@ -373,6 +414,8 @@ namespace Player.Inventory
 
 				inventory[a.slot] = (ItemStack)hotbar[b.slot].Copy();
 				hotbar[b.slot] = (ItemStack)copy.Copy();
+				onSlotUpdate?.Invoke(inventory[a.slot], new ItemLocation(true, ItemPosition.Inventory, a.slot));
+				onSlotUpdate?.Invoke(inventory[b.slot], new ItemLocation(true, ItemPosition.Hotbar, b.slot));
 			}
 			else if (a.generalPosition == ItemPosition.Inventory && b.generalPosition == ItemPosition.Inventory)
 			{
@@ -380,6 +423,8 @@ namespace Player.Inventory
 
 				inventory[a.slot] = (ItemStack)inventory[b.slot].Copy();
 				inventory[b.slot] = (ItemStack)copy.Copy();
+				onSlotUpdate?.Invoke(inventory[a.slot], new ItemLocation(true, ItemPosition.Inventory, a.slot));
+				onSlotUpdate?.Invoke(inventory[b.slot], new ItemLocation(true, ItemPosition.Inventory, b.slot));
 			}
 		}
 

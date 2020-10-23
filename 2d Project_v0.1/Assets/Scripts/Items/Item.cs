@@ -7,7 +7,7 @@ namespace GameItems
     /// <summary>
     /// Item data as scriptable object.
     /// </summary>
-    [CreateAssetMenu(fileName = "NewItem", menuName = "Item")]
+    [CreateAssetMenu(fileName = "NewItem", menuName = "Items/Item")]
     public class Item : ScriptableObject
     {
         public string itemName;

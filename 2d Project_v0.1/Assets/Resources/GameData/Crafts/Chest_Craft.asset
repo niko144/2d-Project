@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c0006f0a5558f54db0da01cdadf1012, type: 3}
+  m_Name: Chest_Craft
+  m_EditorClassIdentifier: 
+  possibleCrafts:
+  - required:
+    - item: {fileID: 11400000, guid: c96087acf74833b42a77f50b93b7f1ca, type: 2}
+      amount: 5
+    - item: {fileID: 11400000, guid: 26009e2f98e0f9143a1caed8558f3dab, type: 2}
+      amount: 1
+    chooseChance: 1
+    result:
+      item: {fileID: 0}
+      amount: 0
+  result:
+    item: {fileID: 11400000, guid: 43014e4142de22841b1115979b2cb323, type: 2}
+    amount: 1
