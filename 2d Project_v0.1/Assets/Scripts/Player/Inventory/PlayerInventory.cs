@@ -45,19 +45,10 @@ namespace Inventory.Player
 		private void Awake()
 		{
 			SetupInventory();
-			if (ItemDropManager.current != null)
-			{
-				ItemDropManager.current.DropItemStack(transform.position, new ItemStack(ItemManager.GetIdByName("Wood"), 5));
-			}
 		}
 		private void Start()
 		{
 			StartCoroutine(TestAddingItems());
-
-			if (ItemDropManager.current != null)
-			{
-				ItemDropManager.current.DropItemStack(transform.position, new ItemStack(ItemManager.GetIdByName("Wood"), 5));
-			}
 		}
 
 		IEnumerator TestAddingItems()
