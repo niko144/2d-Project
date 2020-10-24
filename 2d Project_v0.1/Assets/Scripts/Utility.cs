@@ -38,4 +38,14 @@ public static class Utility
 
 		return ret;
 	}
+
+	/// <summary>
+	/// returns 1 if the value is > 0 and -1 if the value is < 0. Otherwise 0.
+	/// </summary>
+	public static float GetAbsValue(this float target)
+	{
+		if (target > 0f) return 1f;
+		if (target < 0f) return -1f;
+		return 0f;
+	}
 }
