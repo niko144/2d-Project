@@ -2,6 +2,7 @@
 using Inventory.Player;
 using GameItems;
 using GameItems.Location;
+using PlayerInput;
 
 namespace Inventory.Vizualization
 {
@@ -15,15 +16,21 @@ namespace Inventory.Vizualization
 		[Space(15f)]
 		public Transform inventorySlotContainer;
 		public Transform hotbarSlotContainer;
+		public GameObject permanentHotbarObject;
+		public Transform permanentHotbarContainer;
 
 		private GameObject[] inventorySlots;
 		private GameObject[] hotbarSlots;
+
+		bool inventoryOpen = false;
 
 		private void Awake()
 		{
 			InitializeVariables();
 			InstantiateAllSlots();
+			inventoryOpen = transform.GetChild(0).gameObject.activeSelf;
 			playerInventory.onSlotUpdate += UpdateSlot;
+			UserInput.toggleInventory += ToggleInventory;
 		}
 
 		void InitializeVariables()
@@ -76,6 +83,24 @@ namespace Inventory.Vizualization
 			}
 		}
 
+		void ToggleInventory()
+		{
+			inventoryOpen = !inventoryOpen;
+			transform.GetChild(0).gameObject.SetActive(!transform.GetChild(0).gameObject.activeSelf);
+			permanentHotbarObject.gameObject.SetActive(!permanentHotbarObject.activeSelf);
+			CopyInventoryHotbarToPermanentHotbar();
+		}
+
+		void CopyInventoryHotbarToPermanentHotbar()
+		{
+			ClearContainer(permanentHotbarContainer);
+
+			for (int i = 0; i < hotbarSlotContainer.childCount; i++)
+			{
+				Instantiate(hotbarSlotContainer.GetChild(i).gameObject, permanentHotbarContainer);
+			}
+		}
+
 		void UpdateSlot(ItemStack data, ItemLocation slot)
 		{
 			if(slot.generalPosition == ItemPosition.Hotbar)
@@ -100,6 +125,7 @@ namespace Inventory.Vizualization
 					inventorySlots[slot.slot].transform.GetChild(0).GetComponent<VisualItemStack>().SetByStack(data);
 				}
 			}
+			if(!inventoryOpen) CopyInventoryHotbarToPermanentHotbar();
 		}
 
 		void ClearContainer(Transform container)
