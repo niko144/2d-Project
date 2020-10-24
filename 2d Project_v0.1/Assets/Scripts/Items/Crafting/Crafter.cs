@@ -3,40 +3,44 @@ using UnityEngine;
 using GameCrafts;
 using Inventory.Player;
 
-public class Crafter : MonoBehaviour
+namespace GameCrafts.Manager
 {
-	public PlayerInventory playerInventory;
-
-    public void CraftItem(Item item)
+	// Written by Lukas Sacher / Camo
+	public class Crafter : MonoBehaviour
 	{
-		Craft craft = CraftManager.GetCraftByResultItemID(item.GetItemId());
+		public PlayerInventory playerInventory;
 
-		ItemStack[] reqStacks = CraftManager.CraftItemsToItemStacks(craft.required);
-		ItemStack[] resultStacks = CraftManager.CraftItemsToItemStacks(new CraftItem[] { craft.result });
-
-		if (playerInventory.HasStacks(reqStacks))
+		public void CraftItem(Item item)
 		{
-			CraftToPlayerInventory(reqStacks, resultStacks);
-		}
-	}
+			Craft craft = CraftManager.GetCraftByResultItemID(item.GetItemId());
 
-	void CraftToPlayerInventory(ItemStack[] reqStacks, ItemStack[] resultStacks)
-	{
-		foreach (ItemStack s in reqStacks)
-		{
-			playerInventory.RemoveItemOfType(s.itemId, s.size);
-		}
+			ItemStack[] reqStacks = CraftManager.CraftItemsToItemStacks(craft.required);
+			ItemStack[] resultStacks = CraftManager.CraftItemsToItemStacks(new CraftItem[] { craft.result });
 
-		for (int i = 0; i < resultStacks.Length; i++)
-		{
-			int overflow = playerInventory.AddStack(resultStacks[i]);
-			int overflowLeft = overflow;
-			int stackSize = ItemManager.GetStackSizeById(resultStacks[0].itemId);
-
-			while (overflowLeft > 0)
+			if (playerInventory.HasStacks(reqStacks))
 			{
-				ItemDropManager.current.DropItemStack(playerInventory.transform.position, new ItemStack(resultStacks[0].itemId, overflow));
-				overflowLeft -= stackSize;
+				CraftToPlayerInventory(reqStacks, resultStacks);
+			}
+		}
+
+		void CraftToPlayerInventory(ItemStack[] reqStacks, ItemStack[] resultStacks)
+		{
+			foreach (ItemStack s in reqStacks)
+			{
+				playerInventory.RemoveItemOfType(s.itemId, s.size);
+			}
+
+			for (int i = 0; i < resultStacks.Length; i++)
+			{
+				int overflow = playerInventory.AddStack(resultStacks[i]);
+				int overflowLeft = overflow;
+				int stackSize = ItemManager.GetStackSizeById(resultStacks[0].itemId);
+
+				while (overflowLeft > 0)
+				{
+					ItemDropManager.current.DropItemStack(playerInventory.transform.position, new ItemStack(resultStacks[0].itemId, overflow));
+					overflowLeft -= stackSize;
+				}
 			}
 		}
 	}

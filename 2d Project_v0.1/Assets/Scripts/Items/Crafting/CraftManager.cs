@@ -5,7 +5,7 @@ using GameLoad;
 using GameItems;
 using Random = UnityEngine.Random;
 
-namespace GameCrafts
+namespace GameCrafts.Manager
 {
 	// Written by Lukas Sacher / Camo
 

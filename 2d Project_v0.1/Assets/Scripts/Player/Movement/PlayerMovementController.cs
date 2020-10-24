@@ -50,10 +50,12 @@ namespace PlayerMovement
         void LeftInput()
         {
             moveInput.x = -1f;
+            transform.localScale = new Vector2(-1f, transform.localScale.y);
         }
         void RightInput()
         {
             moveInput.x = 1f;
+            transform.localScale = new Vector2(1f, transform.localScale.y);
         }
 
         void Move()
@@ -61,5 +63,12 @@ namespace PlayerMovement
             moveInput.Normalize();
             rb.velocity = moveInput * speed * Time.deltaTime;
         }
+
+        public Vector2 GetPlayerVelocity()
+		{
+            float x = Mathf.Clamp(rb.velocity.x, -1f, 1f);
+            float y = Mathf.Clamp(rb.velocity.y, -1f, 1f);
+            return new Vector2(x, y);
+		}
     }
 }
