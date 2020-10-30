@@ -72,13 +72,15 @@ namespace GameItems
 		public int maxSize;
 		public ItemLocation location;
 
-		public bool isFull => maxSize == size;
+		public bool isFullStack => maxSize == size;
 
 		public ItemStack(string itemId, int size)
 		{
 			this.size = size;
 			this.itemId = itemId;
 			maxSize = ItemManager.GetStackSizeById(itemId);
+
+			if (maxSize <= 0) return;
 
 			if (size > maxSize)
 			{
@@ -88,7 +90,7 @@ namespace GameItems
 			else if (size <= 0)
 			{
 				Debug.LogWarning($"Trying to create an item stack with a negative stack size. {itemId}");
-				this.size = 1;
+				this.size = 0;
 			}
 		}
 

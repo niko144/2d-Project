@@ -19,23 +19,7 @@ namespace Inventory.Player
 
 		public ItemStack[] hotbar;
 		public ItemStack[] inventory;
-		ItemStack[] mergedInventory
-		{
-			get
-			{
-				ItemStack[] ret = new ItemStack[hotbarSlotAmount + inventorySlotAmount];
-				for (int i = 0; i < hotbar.Length; i++)
-				{
-					ret[i] = hotbar[i];
-				}
-				for (int i = hotbar.Length; i < hotbarSlotAmount + inventorySlotAmount; i++)
-				{
-					ret[i] = inventory[i - hotbarSlotAmount];
-				}
-
-				return ret;
-			}
-		}
+		ItemStack[] mergedInventory;
 
 		private bool hotbarIsFull => CheckFullHotbar();
 		private bool inventoryIsFull => CheckFullInventoy();
@@ -48,7 +32,7 @@ namespace Inventory.Player
 		}
 		private void Start()
 		{
-			StartCoroutine(TestAddingItems());
+			//StartCoroutine(TestAddingItems());
 		}
 
 		IEnumerator TestAddingItems()
@@ -71,142 +55,67 @@ namespace Inventory.Player
 		{
 			hotbar = new ItemStack[hotbarSlotAmount];
 			inventory = new ItemStack[inventorySlotAmount];
+			mergedInventory = new ItemStack[inventorySlotAmount + hotbarSlotAmount];
 		}
 
 		/// <summary>
 		/// Adds a stack of items to the inventory.
 		/// </summary>
-		/// <returns>Returns the overflowed item amount.</returns>
+		/// <returns>Returns the overflowed item amount, that doesn't fit into the whole inventory.</returns>
+
 		public override int AddStack(ItemStack stack)
 		{
-			int overflow;
+			int overflow = stack.size;
+			bool existingStacksLeft = true;
 
-			if (!hotbarIsFull)
+			while (existingStacksLeft)
 			{
-				overflow = AddStackToHotbar(stack);
-				return overflow;
-			}
-			else if (!inventoryIsFull)
-			{
-				overflow = AddStackToInventory(stack);
-				return overflow;
-			}
-			return stack.size;
-		}
-		#region AddStackFunctions_ForCleanCode
-		int AddStackToHotbar(ItemStack stack)
-		{
-			int firstEmptySlot = -1;
-			int overflow = -1;
-
-			for (int i = 0; i < hotbar.Length; i++)
-			{
-				if (hotbar[i] != null && hotbar[i].isFull) continue;
-
-				if (hotbar[i] == null)
-				{
-					if (overflow > 0)
-					{
-						hotbar[i] = new ItemStack(stack.itemId, overflow);
-						onSlotUpdate?.Invoke(hotbar[i], new ItemLocation(ItemPosition.Hotbar, i, this));
-						overflow = 0;
-						break;
-					}
-
-					if (firstEmptySlot < 0)
-					{
-						firstEmptySlot = i;
-					}
-					continue;
-				}
-
-				if (hotbar[i].itemId == stack.itemId)
-				{
-					if (overflow > 0)
-					{
-						hotbar[i].AddItems(overflow);
-						onSlotUpdate?.Invoke(hotbar[i], new ItemLocation(ItemPosition.Hotbar, i, this));
-						overflow = 0;
-						break;
-					}
-					else
-					{
-						overflow = hotbar[i].AddItems(stack.size);
-						onSlotUpdate?.Invoke(hotbar[i], new ItemLocation(ItemPosition.Hotbar, i, this));
-						if (overflow < 1) break;
-					}
-				}
+				(existingStacksLeft, overflow) = AddToExistingStacks(stack, overflow);
 			}
 
-			if (firstEmptySlot > -1 && overflow < 0)
+			if (overflow <= 0)
 			{
-				hotbar[firstEmptySlot] = new ItemStack(stack.itemId, stack.size);
-				onSlotUpdate?.Invoke(hotbar[firstEmptySlot], new ItemLocation(ItemPosition.Hotbar, firstEmptySlot, this));
-				return 0;
-			}
-			if (overflow > 0 && !inventoryIsFull)
-			{
-				overflow = AddStackToInventory(new ItemStack(stack.itemId, overflow));
-			}
-			else if (overflow < 0)
-			{
-				AddStackToInventory(stack);
-			}
-
-			return overflow;
-		}
-
-		private int AddStackToInventory(ItemStack stack)
-		{
-			int firstEmptySlot = -1;
-			int overflow = -1;
-
-			for (int i = 0; i < inventory.Length; i++)
-			{
-				if (inventory[i] != null && inventory[i].isFull) continue;
-
-				if (inventory[i] == null)
-				{
-					if (overflow > 0)
-					{
-						inventory[i] = new ItemStack(stack.itemId, overflow);
-						onSlotUpdate?.Invoke(inventory[i], new ItemLocation(ItemPosition.Inventory, i, this));
-						overflow = 0;
-						break;
-					}
-
-					if (firstEmptySlot < 0) firstEmptySlot = i;
-					continue;
-				}
-
-				if (inventory[i].itemId == stack.itemId)
-				{
-					if (overflow > 0)
-					{
-						inventory[i].AddItems(overflow);
-						onSlotUpdate?.Invoke(inventory[i], new ItemLocation(ItemPosition.Inventory, i, this));
-						overflow = 0;
-						break;
-					}
-					else
-					{
-						overflow = inventory[i].AddItems(stack.size);
-						onSlotUpdate?.Invoke(inventory[i], new ItemLocation(ItemPosition.Inventory, i, this));
-
-						if (overflow < 1) break;
-					}
-				}
-			}
-
-			if (firstEmptySlot > -1 && overflow < 0)
-			{
-				inventory[firstEmptySlot] = new ItemStack(stack.itemId, stack.size);
-				onSlotUpdate?.Invoke(inventory[firstEmptySlot], new ItemLocation(ItemPosition.Inventory, firstEmptySlot, this));
+				EditedMergedInventory();
 				return 0;
 			}
 
+			ItemStack overflowData = new ItemStack(stack.itemId, overflow);
+
+			for (int i = 0; i < mergedInventory.Length; i++)
+			{
+				if (mergedInventory[i] == null)
+				{
+					SetMergedInventorSlot(i, overflowData);
+					EditedMergedInventory();
+					return 0;
+				}
+			}
+
+			EditedMergedInventory();
 			return overflow;
 		}
+		#region AddStackFunctions ForCleanCode
+
+		(bool, int) AddToExistingStacks(ItemStack stack, int currentOverflow)
+		{
+			int overflow = currentOverflow;
+			bool foundStack = false;
+
+			for (int i = 0; i < mergedInventory.Length; i++)
+			{
+				if (mergedInventory[i] == null) continue;
+
+				if (mergedInventory[i].itemId == stack.itemId && !mergedInventory[i].isFullStack)
+				{
+					overflow = AddItemsToMergedInventorySlot(i, stack.size);
+					foundStack = true;
+					break;
+				}
+			}
+
+			return (foundStack, overflow);
+		}
+
 		#endregion
 		/// <summary>
 		/// Adds an item to the inventory.
@@ -411,6 +320,8 @@ namespace Inventory.Player
 				onSlotUpdate?.Invoke(inventory[from.slot], new ItemLocation(ItemPosition.Inventory, from.slot, this));
 				onSlotUpdate?.Invoke(inventory[to.slot], new ItemLocation(ItemPosition.Inventory, to.slot, this));
 			}
+
+			EditedSplitInventory();
 		}
 		/// <summary>
 		/// Changes the items at the given positions
@@ -562,6 +473,118 @@ namespace Inventory.Player
 				}
 			}
 			return true;
+		}
+
+		void EditedSplitInventory()
+		{
+			for (int i = 0; i < hotbar.Length; i++)
+			{
+				if (hotbar[i] == null)
+				{
+					mergedInventory[i] = null;
+					continue;
+				}
+
+				mergedInventory[i] = hotbar[i].Copy() as ItemStack;
+			}
+
+			int mergedIndex = hotbar.Length;
+			for (int i = 0; i < inventory.Length; i++, mergedIndex++)
+			{
+				if(inventory[i] == null)
+				{
+					mergedInventory[mergedIndex] = null;
+					continue;
+				}
+
+				mergedInventory[mergedIndex] = inventory[i].Copy() as ItemStack;
+			}
+		}
+		void EditedMergedInventory()
+		{
+			int mergedIndex = 0;
+			for (int i = 0; i < hotbar.Length; i++, mergedIndex++)
+			{
+				hotbar[i] = mergedInventory[mergedIndex];
+			}
+
+			for (int i = 0; i < inventory.Length; i++, mergedIndex++)
+			{
+				inventory[i] = mergedInventory[mergedIndex];
+			}
+		}
+
+		void SetHotbarSlot(int index, ItemStack data)
+		{
+			hotbar[index] = data;
+			mergedInventory[index] = hotbar[index].Copy() as ItemStack;
+			onSlotUpdate?.Invoke(hotbar[index], new ItemLocation(ItemPosition.Hotbar, index, this));
+		}
+		int AddItemsToHotbarSlot(int index, int amount)
+		{
+			int overflow = 0;
+
+			if(amount < 0)
+			{
+				hotbar[index].RemoveItems(Mathf.Abs(amount));
+				mergedInventory[index] = hotbar[index].Copy() as ItemStack;
+				onSlotUpdate?.Invoke(hotbar[index], new ItemLocation(ItemPosition.Hotbar, index, this));
+			}
+			else if (amount > 0)
+			{
+				overflow = hotbar[index].AddItems(amount);
+				mergedInventory[index] = hotbar[index].Copy() as ItemStack;
+				onSlotUpdate?.Invoke(hotbar[index], new ItemLocation(ItemPosition.Hotbar, index, this));
+			}
+
+			return overflow;
+		}
+		void SetInventorySlot(int index, ItemStack data)
+		{
+			inventory[index] = data;
+			mergedInventory[hotbarSlotAmount + index] = inventory[index].Copy() as ItemStack;
+			onSlotUpdate?.Invoke(inventory[index], new ItemLocation(ItemPosition.Inventory, index, this));
+		}
+		int AddItemsToInventorySlot(int index, int amount)
+		{
+			int overflow = 0;
+
+			if (amount < 0)
+			{
+				inventory[index].RemoveItems(Mathf.Abs(amount));
+				mergedInventory[hotbarSlotAmount + index].size = inventory[index].size;
+				onSlotUpdate?.Invoke(inventory[index], new ItemLocation(ItemPosition.Inventory, index, this));
+			}
+			else if (amount > 0)
+			{
+				overflow = inventory[index].AddItems(amount);
+				mergedInventory[hotbarSlotAmount + index].size = inventory[index].size;
+				onSlotUpdate?.Invoke(inventory[index], new ItemLocation(ItemPosition.Inventory, index, this));
+			}
+
+			return overflow;
+		}
+		void SetMergedInventorSlot(int index, ItemStack data)
+		{
+			if (index < hotbarSlotAmount)
+			{
+				SetHotbarSlot(index, data);
+			}
+			else
+			{
+				SetInventorySlot(index - hotbarSlotAmount, data);
+			}
+		}
+		int AddItemsToMergedInventorySlot(int index, int amount)
+		{
+			if(index < hotbarSlotAmount)
+			{
+				return AddItemsToHotbarSlot(index, amount);
+			}
+			else
+			{
+				return AddItemsToInventorySlot(index - hotbarSlotAmount, amount);
+			}
 		}
 	}
 }

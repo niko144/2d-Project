@@ -11,6 +11,8 @@ public class ItemDropManager : MonoBehaviour
 	public LayerMask whatCanPickUp;
 	public float dropForce;
 	public Sprite defaultSprite;
+	[Space(15f)]
+	public int testItemsSpawned = 9;
 
 	private void Awake()
 	{
@@ -26,7 +28,7 @@ public class ItemDropManager : MonoBehaviour
 
 	private void Start()
 	{
-		for (int i = 0; i < 8; i++)
+		for (int i = 0; i < testItemsSpawned; i++)
 		{
 			DropItemStack(new Vector2(Random.Range(-2f, 2f), Random.Range(-2f, 2f)), new ItemStack(ItemManager.GetIdByName("Chest"), 3));
 		}
