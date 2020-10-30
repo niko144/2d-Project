@@ -103,26 +103,28 @@ namespace Inventory.Vizualization
 
 		void UpdateSlot(ItemStack data, ItemLocation slot)
 		{
+			if (data == null) return;
+
 			if(slot.generalPosition == ItemPosition.Hotbar)
 			{
-				if(hotbarSlots[slot.slot].transform.childCount == 0 && data != null)
+				if(hotbarSlots[slot.slot].transform.childCount == 0)
 				{
 					Instantiate(itemStackPrefab, hotbarSlots[slot.slot].transform).GetComponent<VisualItemStack>().SetByStack(data);
 				}
 				else
 				{
-					hotbarSlots[slot.slot].transform.GetChild(0).GetComponent<VisualItemStack>().SetByStack(data);
+					hotbarSlots[slot.slot].transform.GetComponentInChildren<VisualItemStack>().SetByStack(data);
 				}
 			}
 			else if(slot.generalPosition == ItemPosition.Inventory)
 			{
-				if (inventorySlots[slot.slot].transform.childCount == 0 && data != null)
+				if (inventorySlots[slot.slot].transform.childCount == 0)
 				{
 					Instantiate(itemStackPrefab, inventorySlots[slot.slot].transform).GetComponent<VisualItemStack>().SetByStack(data);
 				}
 				else
 				{
-					inventorySlots[slot.slot].transform.GetChild(0).GetComponent<VisualItemStack>().SetByStack(data);
+					inventorySlots[slot.slot].transform.GetComponentInChildren<VisualItemStack>().SetByStack(data);
 				}
 			}
 			if(!inventoryOpen) CopyInventoryHotbarToPermanentHotbar();

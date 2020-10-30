@@ -107,8 +107,9 @@ namespace GameItems.Drop
 					CollectAndAdd(col.gameObject.GetComponent<EntityInventory>());
 					return;
 				}
-				catch
+				catch (Exception e)
 				{
+					throw e;
 					throw new System.Exception($"GameObject '{col.gameObject.name}' is on the Player layer but has no Inventory!");
 				}
 			}

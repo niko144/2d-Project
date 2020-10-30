@@ -24,7 +24,16 @@ public class ItemDropManager : MonoBehaviour
 		}
 	}
 
-    public void DropItemStack(Vector2 pos, ItemStack stack)
+	private void Start()
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			DropItemStack(new Vector2(Random.Range(-2f, 2f), Random.Range(-2f, 2f)), new ItemStack(ItemManager.GetIdByName("Chest"), 3));
+		}
+
+	}
+
+	public void DropItemStack(Vector2 pos, ItemStack stack)
 	{
 		GameObject dropped = Instantiate(droppedItemPrefab, pos, Quaternion.identity);
 		DroppedItem itemData = dropped.GetComponent<DroppedItem>();

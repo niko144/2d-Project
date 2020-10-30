@@ -23,7 +23,6 @@ namespace GameItems.Location
 		Inventory,
 		Hotbar,
 		Stored,
-		Dropped
 	}
 
 	/// <summary>
@@ -31,29 +30,35 @@ namespace GameItems.Location
 	/// </summary>
 	public class ItemLocation
 	{
-		/// <summary>
-		/// If the position is assigned to an item.
-		/// </summary>
-		public bool hasItem = false;
+		public bool isStored 
+		{
+			get => itemStore == null;
+		}
 		public ItemPosition generalPosition;
 		public int slot;
+		public IItemStore itemStore = null;
 
 		public ItemLocation()
 		{
 
 		}
-		public ItemLocation(bool valid, ItemPosition generalPos, int index)
+		public ItemLocation(ItemPosition generalPos, int index, IItemStore itemStore)
 		{
-			hasItem = valid;
 			generalPosition = generalPos;
 			slot = index;
+			this.itemStore = itemStore;
 		}
-		public ItemLocation(bool valid, ItemPosition generalPos)
+		public ItemLocation(ItemPosition generalPos, IItemStore itemStore)
 		{
-			hasItem = valid;
 			generalPosition = generalPos;
 			slot = -1;
+			this.itemStore = itemStore;
 		}
+	}
+
+	public interface IItemStore
+	{
+
 	}
 }
 
@@ -66,6 +71,8 @@ namespace GameItems
 		public int size;
 		public int maxSize;
 		public ItemLocation location;
+
+		public bool isFull => maxSize == size;
 
 		public ItemStack(string itemId, int size)
 		{
@@ -85,9 +92,9 @@ namespace GameItems
 			}
 		}
 
-		public void SetupLocation(ItemPosition pos, int index)
+		public void SetupLocation(ItemPosition pos, int index, IItemStore store)
 		{
-			location = new ItemLocation(true, pos, index);
+			location = new ItemLocation(pos, index, store);
 		}
 
 		/// <summary>

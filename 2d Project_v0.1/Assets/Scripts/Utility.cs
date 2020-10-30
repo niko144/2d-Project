@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Add this interface to a class to prevent reference copys.
@@ -47,5 +49,25 @@ public static class Utility
 		if (target > 0f) return 1f;
 		if (target < 0f) return -1f;
 		return 0f;
+	}
+
+	/// <summary>
+	/// Returns all ui elements under the mouse.
+	/// </summary>
+	/// <returns></returns>
+	public static List<RaycastResult> RaycastMouse()
+	{
+
+		PointerEventData pointerData = new PointerEventData(EventSystem.current)
+		{
+			pointerId = -1,
+		};
+
+		pointerData.position = Input.mousePosition;
+
+		List<RaycastResult> results = new List<RaycastResult>();
+		EventSystem.current.RaycastAll(pointerData, results);
+
+		return results;
 	}
 }
