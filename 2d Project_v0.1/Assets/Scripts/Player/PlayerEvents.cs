@@ -3,7 +3,6 @@ using UnityEngine;
 using System.Reflection;
 using System.Collections.Generic;
 
-
 namespace Events.Player
 {
     //Written by Muneeb Ur Rahman with the help of Camo
