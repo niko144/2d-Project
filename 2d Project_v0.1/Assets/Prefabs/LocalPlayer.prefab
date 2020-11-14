@@ -26,8 +26,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5680396752486799230}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.044, z: 0}
-  m_LocalScale: {x: 2.35, y: 2.35, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5680396753615225956}
   m_RootOrder: 0
@@ -70,7 +70,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: c19f1ff8971e71b4a872fed49d851fcc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -128,7 +128,7 @@ Transform:
   m_GameObject: {fileID: 5680396752820857749}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.35, y: 2.35, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5680396753615225956}
   m_RootOrder: 1
@@ -217,8 +217,9 @@ GameObject:
   - component: {fileID: 5680396753523195637}
   - component: {fileID: 5680396753523195636}
   - component: {fileID: 5680396753523195642}
+  - component: {fileID: 630183604}
   m_Layer: 8
-  m_Name: Player
+  m_Name: LocalPlayer
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -284,7 +285,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.43226933, y: 0.17000002}
+  m_Size: {x: 0.21693718, y: 0.17000002}
   m_EdgeRadius: 0
 --- !u!114 &5680396753523195638
 MonoBehaviour:
@@ -298,7 +299,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d7472c4d7930534780a18b80d4e8ed8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 200
+  speed: 320
 --- !u!114 &5680396753523195637
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -346,6 +347,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dc869e7d34ff8e45869892d14016d1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &630183604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5680396753523195634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dac39bd09bb5d3f44af7ebbcbaa5331d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slotSelectionUiPrefab: {fileID: 4580367965476784874, guid: 2b047529e5b0c2b4daac91f8baa26e7b,
+    type: 3}
+  hotbarSlotsContainer: {fileID: 0}
 --- !u!1 &5680396753615225955
 GameObject:
   m_ObjectHideFlags: 0

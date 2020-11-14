@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
-using Inventory;
+using GameItems;
 using PlayerInput;
 using System;
 using Events.Entitys;
+using GameItems.Inventorys.Entitys;
 
 namespace GameItems.Drop
 {
@@ -69,7 +70,7 @@ namespace GameItems.Drop
 		{
 			if(data == null)
 			{
-				throw new System.Exception($"No DropItem.data assigned ({transform.name}). Use the CopyFrom function to assign data.");
+				Printer.Throw($"No DropItem.data assigned ({transform.name}). Use the CopyFrom function to assign data.");
 			}
 			Destroy(gameObject);
 			return data;
@@ -81,7 +82,7 @@ namespace GameItems.Drop
 		{
 			if (data == null)
 			{
-				throw new System.Exception($"No DropItem.data assigned ({transform.name}). Use the CopyFrom function to assign data.");
+				Printer.Throw($"No DropItem.data assigned ({transform.name}). Use the CopyFrom function to assign data.");
 			}
 
 			int rest = inventory.AddStack(data);
@@ -109,8 +110,8 @@ namespace GameItems.Drop
 				}
 				catch (Exception e)
 				{
+					Printer.Throw($"GameObject '{col.gameObject.name}' is on the Player layer but has no Inventory!");
 					throw e;
-					throw new System.Exception($"GameObject '{col.gameObject.name}' is on the Player layer but has no Inventory!");
 				}
 			}
 		}

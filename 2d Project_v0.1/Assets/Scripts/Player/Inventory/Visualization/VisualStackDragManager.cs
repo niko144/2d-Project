@@ -1,15 +1,16 @@
 ﻿using GameItems;
 using GameItems.Location;
-using Inventory.Player;
+using GameItems.Inventorys;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using GameItems.Inventorys.Entitys.Player;
 
 public class VisualStackDragManager : MonoBehaviour
 {
 	public static VisualStackDragManager current = null;
 
-	public PlayerInventory inventory;
+	PlayerInventory inventory = null;
 
     public Transform inventorySlotContainer;
     public Transform hotbarSlotContainer;
@@ -27,8 +28,10 @@ public class VisualStackDragManager : MonoBehaviour
 		}
 		else
 		{
-			throw new System.Exception($"Make sure there is only one '{this.GetType().Name}' in the scene.");
+			Printer.Throw($"Make sure there is only one '{this.GetType().Name}' in the scene.");
 		}
+
+		inventory = GameManager.current.LocalPlayer?.GetComponent<PlayerInventory>();
 	}
 
 	private void Start()

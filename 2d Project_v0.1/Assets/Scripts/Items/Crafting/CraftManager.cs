@@ -4,8 +4,9 @@ using UnityEngine;
 using GameLoad;
 using GameItems;
 using Random = UnityEngine.Random;
+using GameItems.Crafts;
 
-namespace GameCrafts.Manager
+namespace GameItems.Manager
 {
 	// Written by Lukas Sacher / Camo
 
@@ -24,53 +25,38 @@ namespace GameCrafts.Manager
 
 			for (int i = 0; i < allCrafts.Length; i++)
 			{
-				allCrafts[i] = allCrafts[i].Copy();
+				allCrafts[i] = allCrafts[i].Copy() as CraftingRecipe;
 			}
-
-			AdjustChooseChances();
-			ChooseCrafts();
 		}
-		// Execute this on a new game in the future. Not in the GameLoad.
-		static void ChooseCrafts()
+
+		public static void ChooseCrafts()
 		{
 			crafts = new Craft[allCrafts.Length];
 
 			for (int i = 0; i < allCrafts.Length; i++)
 			{
 				float random01 = Random.Range(0f, 1f);
-				for (int j = 0; j < allCrafts[i].possibleCrafts.Length; j++)
+				for (int j = 0; j < allCrafts[i].PossibleCrafts.Length; j++)
 				{
-					allCrafts[i].possibleCrafts[j].result = allCrafts[i].result.Copy();
+					allCrafts[i].PossibleCrafts[j].result = allCrafts[i].Result.Copy() as CraftItem;
 
-					if (random01 < allCrafts[i].possibleCrafts[j].chooseChance)
+					if (random01 < allCrafts[i].PossibleCrafts[j].ChooseChance)
 					{
-						crafts[i] = allCrafts[i].possibleCrafts[j].Copy();
+						crafts[i] = allCrafts[i].PossibleCrafts[j].Copy() as Craft;
 						break;
 					}
 				}
 			}
 		}
-		static void AdjustChooseChances()
+		public static void AdjustChooseChances()
 		{
 			foreach (CraftingRecipe c in allCrafts)
 			{
-				for (int i = 1; i < c.possibleCrafts.Length; i++)
+				for (int i = 1; i < c.PossibleCrafts.Length; i++)
 				{
-					c.possibleCrafts[i].chooseChance += c.possibleCrafts[i - 1].chooseChance;
+					c.PossibleCrafts[i].AddToChooseChance(c.PossibleCrafts[i - 1].ChooseChance);
 				}
 			}
-		}
-
-		public static Craft GetCraftByResultItemID(string id)
-		{
-			foreach (Craft craft in crafts)
-			{
-				if(craft.result.item.GetItemId() == id)
-				{
-					return craft;
-				}
-			}
-			return null;
 		}
 
 		public static ItemStack[] CraftItemsToItemStacks(CraftItem[] items)
@@ -81,7 +67,7 @@ namespace GameCrafts.Manager
 			int amountLeft = 0;
 			for (int i = 0; i < items.Length; i++, retIndex++)
 			{
-				if(amountLeft <= 0) amountLeft = items[i].amount;
+				if (amountLeft <= 0) amountLeft = items[i].amount;
 
 				string currentId = items[i].item.GetItemId();
 
@@ -92,6 +78,23 @@ namespace GameCrafts.Manager
 			}
 
 			return ret.ToArray();
+		}
+
+		public static Craft GetCraftByResultItemID(string id)
+		{
+			if (crafts == null)
+			{
+				Printer.Throw("Craft array of the Craft Finder isn't assigned!");
+			}
+
+			foreach (Craft craft in crafts)
+			{
+				if (craft.result.item.GetItemId() == id)
+				{
+					return craft;
+				}
+			}
+			return null;
 		}
 	}
 }

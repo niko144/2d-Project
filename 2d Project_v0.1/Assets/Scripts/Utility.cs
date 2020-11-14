@@ -6,9 +6,9 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// Add this interface to a class to prevent reference copys.
 /// </summary>
-public interface IListCopyable
+public interface ICopyable
 {
-	IListCopyable Copy();
+	ICopyable Copy();
 }
 
 /// <summary>
@@ -16,7 +16,7 @@ public interface IListCopyable
 /// </summary>
 public static class Utility
 {
-	public static List<T> ToList<T>(this Array array) where T : IListCopyable
+	public static List<T> ToList<T>(this Array array) where T : ICopyable
 	{
 		List<T> ret = new List<T>();
 
@@ -28,7 +28,7 @@ public static class Utility
 
 		return ret;
 	}
-	public static List<T> ToList<T>(this List<T> list) where T : IListCopyable
+	public static List<T> ToList<T>(this List<T> list) where T : ICopyable
 	{
 		List<T> ret = new List<T>();
 
@@ -69,5 +69,51 @@ public static class Utility
 		EventSystem.current.RaycastAll(pointerData, results);
 
 		return results;
+	}
+
+	public static bool CheckForNameTagInParents(this Transform target, string tag)
+	{
+		Transform currentParent = target.parent;
+
+		while (currentParent != null)
+		{
+			if (currentParent.name.Contains($"_{tag}"))
+			{
+				return true;
+			}
+
+			currentParent = currentParent.parent;
+		}
+
+		return false;
+	}
+
+	public static string FindTagInName(this Transform target)
+	{
+		string name = target.name;
+		string tag = "";
+
+		if (!name.Contains("_")) return "";
+
+		char[] nameLetters = name.ToCharArray();
+
+		for (int i = 0; i < nameLetters.Length; i++)
+		{
+			if (nameLetters[i] != '_' || i < nameLetters.Length - 1) continue;
+
+			for (int j = i + 1; j < nameLetters.Length; j++)
+			{
+				if (nameLetters[j] == '_') break;
+				tag += nameLetters[j];
+			}
+			break;
+		}
+
+		return tag;
+	}
+
+	public static bool HasNameTag(this Transform target, string tag)
+	{
+		return target.name.Contains($"_{tag}");
 	}
 }

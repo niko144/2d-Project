@@ -7,6 +7,7 @@ namespace Chunks
     {
         public static ChunkMaster current = null;
 
+        [HideInInspector]
         public GameObject player;
         [Space(10f)]
         public float loadingDistance;
@@ -19,8 +20,10 @@ namespace Chunks
             }
             else
             {
-                throw new System.Exception("Make sure there is only one game object with the ChunkMaster script attached!");
+                Printer.Throw("Make sure there is only one game object with the ChunkMaster script attached!");
             }
+
+            player = GameManager.current.LocalPlayer;
         }
     }
 }

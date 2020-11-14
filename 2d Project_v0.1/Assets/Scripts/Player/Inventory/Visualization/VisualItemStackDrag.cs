@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using GameItems.Location;
 using UnityEngine.UI;
+using GameItems.Inventorys.Entitys.Player;
 
 public class VisualItemStackDrag : MonoBehaviour, IPointerClickHandler
 {
@@ -12,6 +13,8 @@ public class VisualItemStackDrag : MonoBehaviour, IPointerClickHandler
 	ItemLocation currentLocation;
 
 	Transform originalParent;
+
+	PlayerInventory playerInventory;
 
 	public void OnPointerClick(PointerEventData eventData)
 	{
@@ -58,7 +61,6 @@ public class VisualItemStackDrag : MonoBehaviour, IPointerClickHandler
 
 			if (go != gameObject && go.name.Contains("_VisualItemStack"))
 			{
-				Debug.Log("epokf");
 				return false;
 			}
 
@@ -100,11 +102,11 @@ public class VisualItemStackDrag : MonoBehaviour, IPointerClickHandler
 
 		currentLocation.slot = transform.parent.GetSiblingIndex();
 
-		if (transform.parent.parent == VisualStackDragManager.current.hotbarSlotContainer)
+		if (transform.CheckForNameTagInParents(VisualStackDragManager.current.hotbarSlotContainer.FindTagInName()))
 		{
 			currentLocation.generalPosition = ItemPosition.Hotbar;
 		}
-		else if (transform.parent.parent == VisualStackDragManager.current.inventorySlotContainer)
+		else if (transform.CheckForNameTagInParents(VisualStackDragManager.current.inventorySlotContainer.FindTagInName()))
 		{
 			currentLocation.generalPosition = ItemPosition.Inventory;
 		}
@@ -116,6 +118,7 @@ public class VisualItemStackDrag : MonoBehaviour, IPointerClickHandler
 
 	void UpdateInventoryData()
 	{
-		VisualStackDragManager.current.inventory.SwapItemPosition(previousLocation, currentLocation);
+		if (playerInventory == null) playerInventory = GameManager.current.GetComponentFromLocalPlayer<PlayerInventory>();
+		if(playerInventory != null) playerInventory.SwapItemPosition(previousLocation, currentLocation);
 	}
 }

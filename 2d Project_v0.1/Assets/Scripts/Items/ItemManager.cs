@@ -63,7 +63,9 @@ namespace GameItems
 					return item.GetItemId();
 				}
 			}
-			throw new System.Exception($"Couldn't find item with name: '{name}'!");
+
+			Printer.Throw($"Couldn't find item with name: '{name}'!");
+			return "";
 		}
 		public static Item GetItemById(string itemId)
 		{
@@ -74,7 +76,8 @@ namespace GameItems
 					return item;
 				}
 			}
-			throw new System.Exception($"Couldn't find item with id: '{itemId}'!");
+			Printer.Throw($"Couldn't find item with id: '{itemId}'!");
+			return null;
 		}
 	}
 }

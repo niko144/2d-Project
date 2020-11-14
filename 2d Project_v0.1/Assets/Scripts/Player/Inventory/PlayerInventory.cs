@@ -7,22 +7,59 @@ using UnityEngine;
 
 // Written by Lukas Sacher / Camo
 
-namespace Inventory.Player
+namespace GameItems.Inventorys.Entitys.Player
 {
 	/// <summary>
-	/// The inventory of the player. This class only contains the data. Visualizing the inventory is handled by other classes.
+	/// The inventory of the player. This class only contains data. Visualizing the inventory is handled by other classes.
 	/// </summary>
 	public class PlayerInventory : EntityInventory, IItemStore
 	{
-		public int hotbarSlotAmount;
-		public int inventorySlotAmount;
+		[SerializeField]
+		int hotbarSlotAmount = 0;
+		public int HotbarSlotAmount
+		{
+			get
+			{
+				return hotbarSlotAmount;
+			}
+		}
+		[SerializeField]
+		int inventorySlotAmount = 0;
+		public int InventorySlotAmount
+		{
+			get
+			{
+				return hotbarSlotAmount;
+			}
+		}
 
-		public ItemStack[] hotbar;
-		public ItemStack[] inventory;
+		ItemStack[] hotbar;
+		public ItemStack[] Hotbar
+		{
+			get
+			{
+				return hotbar;
+			}
+		}
+		ItemStack[] inventory;
+		public ItemStack[] Inventory
+		{
+			get
+			{
+				return inventory;
+			}
+		}
 		ItemStack[] mergedInventory;
+		public ItemStack[] MergedInventory
+		{
+			get
+			{
+				return mergedInventory;
+			}
+		}
 
-		private bool hotbarIsFull => CheckFullHotbar();
-		private bool inventoryIsFull => CheckFullInventoy();
+		public bool HotbarIsFull => CheckFullHotbar();
+		public bool InventoryIsFull => CheckFullInventoy();
 
 		public event Action<ItemStack, ItemLocation> onSlotUpdate;
 
@@ -81,20 +118,28 @@ namespace Inventory.Player
 
 			ItemStack overflowData = new ItemStack(stack.itemId, overflow);
 
-			for (int i = 0; i < mergedInventory.Length; i++)
-			{
-				if (mergedInventory[i] == null)
-				{
-					SetMergedInventorSlot(i, overflowData);
-					EditedMergedInventory();
-					return 0;
-				}
-			}
+			overflow = AddToEmptySlot(overflowData);
 
 			EditedMergedInventory();
 			return overflow;
 		}
 		#region AddStackFunctions ForCleanCode
+		int AddToEmptySlot(ItemStack stack)
+		{
+			int overflow = stack.size;
+
+			for (int i = 0; i < mergedInventory.Length; i++)
+			{
+				if (mergedInventory[i] == null)
+				{
+					SetMergedInventorSlot(i, stack);
+					overflow = 0;
+					break;
+				}
+			}
+
+			return overflow;
+		}
 
 		(bool, int) AddToExistingStacks(ItemStack stack, int currentOverflow)
 		{
@@ -115,15 +160,15 @@ namespace Inventory.Player
 
 			return (foundStack, overflow);
 		}
-
 		#endregion
+
 		/// <summary>
 		/// Adds an item to the inventory.
 		/// </summary>
 		/// <returns>Returns if the item could be added.</returns>
 		public override bool AddItem(Item item)
 		{
-			if (hotbarIsFull && inventoryIsFull)
+			if (HotbarIsFull && InventoryIsFull)
 			{
 				return false;
 			}
@@ -133,10 +178,14 @@ namespace Inventory.Player
 				return true;
 			}
 		}
+		/// <summary>
+		/// Adds an item to the inventory.
+		/// </summary>
+		/// <returns>Returns if the item could be added.</returns>
 		public override bool AddItem(string itemId)
 		{
 			Item item = ItemManager.GetItemById(itemId);
-			if (hotbarIsFull && inventoryIsFull)
+			if (HotbarIsFull && InventoryIsFull)
 			{
 				return false;
 			}
@@ -146,71 +195,59 @@ namespace Inventory.Player
 				return true;
 			}
 		}
-
+		/// <summary>
+		/// Removes an item of the inventory.
+		/// </summary>
 		public void RemoveItemOfType(string itemId)
 		{
-			ItemLocation itemPosition = SearchForItem(itemId);
-			if (itemPosition.isStored)
-			{
-				if (itemPosition.generalPosition == ItemPosition.Hotbar)
-				{
-					hotbar[itemPosition.slot].RemoveItems(1);
-					onSlotUpdate?.Invoke(hotbar[itemPosition.slot], new ItemLocation(ItemPosition.Hotbar, itemPosition.slot, this));
-				}
-				else if (itemPosition.generalPosition == ItemPosition.Hotbar)
-				{
-					inventory[itemPosition.slot].RemoveItems(1);
-					onSlotUpdate?.Invoke(inventory[itemPosition.slot], new ItemLocation(ItemPosition.Inventory, itemPosition.slot, this));
-				}
-			}
+			int itemPosition = SearchForItem(itemId).GetMergedInventoryIndex();
+
+			AddItemsToMergedInventorySlot(itemPosition, -1);
+
 			CleanSlots();
 		}
+		/// <summary>
+		/// Removes the given amount of an item of the inventory
+		/// </summary>
 		public override void RemoveItemOfType(string itemId, int amount)
 		{
-			ItemLocation[] itemPositions = SearchForItems(itemId);
+			int[] itemPositions = LocationsToMergedIndices(SearchForItems(itemId));
 			int maxStackSize = ItemManager.GetStackSizeById(itemId);
+
 			int stacks = (int)((float)amount / (float)maxStackSize);
 			int rest = amount - stacks * maxStackSize;
+			int currentStackRest = maxStackSize;
+			int restRest = rest;
 
 			for (int i = itemPositions.Length - 1; i >= 0; i--)
 			{
-				if (!itemPositions[i].isStored) continue;
+				if (stacks <= 0 && restRest <= 0) break;
 
-				if (itemPositions[i].generalPosition == ItemPosition.Hotbar)
+				int stackSize = mergedInventory[itemPositions[i]].size;
+
+				if (stacks > 0)
 				{
-					if (stacks > 0)
+					AddItemsToMergedInventorySlot(itemPositions[i], -currentStackRest);
+					currentStackRest -= stackSize;
+
+					if (currentStackRest <= 0)
 					{
-						hotbar[itemPositions[i].slot].RemoveItems(maxStackSize);
-						onSlotUpdate?.Invoke(hotbar[itemPositions[i].slot], new ItemLocation(ItemPosition.Hotbar, itemPositions[i].slot, this));
 						stacks--;
-					}
-					else
-					{
-						hotbar[itemPositions[i].slot].RemoveItems(rest);
-						onSlotUpdate?.Invoke(hotbar[itemPositions[i].slot], new ItemLocation(ItemPosition.Hotbar, itemPositions[i].slot, this));
-						break;
+						currentStackRest = maxStackSize;
 					}
 				}
-				else if (itemPositions[i].generalPosition == ItemPosition.Inventory)
+				else
 				{
-					if (stacks > 0)
-					{
-						inventory[itemPositions[i].slot].RemoveItems(maxStackSize);
-						onSlotUpdate?.Invoke(inventory[itemPositions[i].slot], new ItemLocation(ItemPosition.Inventory, itemPositions[i].slot, this));
-						stacks--;
-					}
-					else
-					{
-						inventory[itemPositions[i].slot].RemoveItems(rest);
-						onSlotUpdate?.Invoke(inventory[itemPositions[i].slot], new ItemLocation(ItemPosition.Inventory, itemPositions[i].slot, this));
-						break;
-					}
+					AddItemsToMergedInventorySlot(itemPositions[i], restRest);
+					restRest -= stackSize;
 				}
 			}
 
 			CleanSlots();
 		}
-
+		/// <summary>
+		/// Checks if the given stacks are in the players inventory.
+		/// </summary>
 		public override bool HasStacks(ItemStack[] stacks)
 		{
 			List<ItemStack> requiredStacks = stacks.ToList<ItemStack>();
@@ -250,7 +287,7 @@ namespace Inventory.Player
 				{
 					if (requiredStacks[j] == null)
 					{
-						Debug.LogWarning($"No item in the required stacks should be null. Check at index '{j}'");
+						Printer.Warn($"No item in the required stacks should be null. Check at index '{j}'");
 						continue;
 					}
 
@@ -271,20 +308,15 @@ namespace Inventory.Player
 
 		private void CleanSlots()
 		{
-			for (int i = 0; i < hotbar.Length; i++)
+			for (int i = 0; i < mergedInventory.Length; i++)
 			{
-				if (hotbar[i] != null && hotbar[i].size <= 0)
+				if (mergedInventory[i] != null && mergedInventory[i].size <= 0)
 				{
-					hotbar[i] = null;
+					mergedInventory[i] = null;
 				}
 			}
-			for (int i = 0; i < inventory.Length; i++)
-			{
-				if (inventory[i] != null && hotbar[i].size <= 0)
-				{
-					inventory[i] = null;
-				}
-			}
+
+			EditedMergedInventory();
 		}
 
 		/// <summary>
@@ -292,78 +324,24 @@ namespace Inventory.Player
 		/// </summary>
 		public void SwapItemPosition(ItemLocation from, ItemLocation to)
 		{
-			if (from.generalPosition == ItemPosition.Hotbar && to.generalPosition == ItemPosition.Hotbar)
-			{
-				hotbar[to.slot] = hotbar[from.slot].Copy() as ItemStack;
-				hotbar[from.slot] = null;
-				onSlotUpdate?.Invoke(inventory[from.slot], new ItemLocation(ItemPosition.Hotbar, from.slot, this));
-				onSlotUpdate?.Invoke(inventory[to.slot], new ItemLocation(ItemPosition.Hotbar, to.slot, this));
-			}
-			else if (from.generalPosition == ItemPosition.Hotbar && to.generalPosition == ItemPosition.Inventory)
-			{
-				inventory[to.slot] = hotbar[from.slot].Copy() as ItemStack;
-				hotbar[from.slot] = null;
-				onSlotUpdate?.Invoke(inventory[from.slot], new ItemLocation(ItemPosition.Hotbar, from.slot, this));
-				onSlotUpdate?.Invoke(inventory[to.slot], new ItemLocation(ItemPosition.Inventory, to.slot, this));
-			}
-			else if (from.generalPosition == ItemPosition.Inventory && to.generalPosition == ItemPosition.Hotbar)
-			{
-				hotbar[to.slot] = inventory[from.slot].Copy() as ItemStack;
-				inventory[from.slot] = null;
-				onSlotUpdate?.Invoke(inventory[from.slot], new ItemLocation(ItemPosition.Inventory, from.slot, this));
-				onSlotUpdate?.Invoke(inventory[to.slot], new ItemLocation(ItemPosition.Hotbar, to.slot, this));
-			}
-			else if (from.generalPosition == ItemPosition.Inventory && to.generalPosition == ItemPosition.Inventory)
-			{
-				inventory[to.slot] = inventory[from.slot].Copy() as ItemStack;
-				inventory[from.slot] = null;
-				onSlotUpdate?.Invoke(inventory[from.slot], new ItemLocation(ItemPosition.Inventory, from.slot, this));
-				onSlotUpdate?.Invoke(inventory[to.slot], new ItemLocation(ItemPosition.Inventory, to.slot, this));
-			}
+			int fromIndex = from.GetMergedInventoryIndex();
+			int toIndex = to.GetMergedInventoryIndex(); ;
 
-			EditedSplitInventory();
+			SetMergedInventorSlot(toIndex, mergedInventory[fromIndex]);
+			SetMergedInventorSlot(fromIndex, null);
+
+			EditedMergedInventory();
 		}
 		/// <summary>
 		/// Changes the items at the given positions
 		/// </summary>
 		public void SwitchItems(ItemLocation a, ItemLocation b)
 		{
-			if (a.generalPosition == ItemPosition.Hotbar && b.generalPosition == ItemPosition.Hotbar)
-			{
-				ItemStack copy = (ItemStack)hotbar[a.slot].Copy();
+			ItemStack copy = mergedInventory[a.GetMergedInventoryIndex()].Copy() as ItemStack;
+			SetMergedInventorSlot(a.GetMergedInventoryIndex(), mergedInventory[b.GetMergedInventoryIndex()]);
+			SetMergedInventorSlot(b.GetMergedInventoryIndex(), copy);
 
-				hotbar[a.slot] = (ItemStack)hotbar[b.slot].Copy();
-				hotbar[b.slot] = (ItemStack)copy.Copy();
-				onSlotUpdate?.Invoke(inventory[a.slot], new ItemLocation(ItemPosition.Hotbar, a.slot, this));
-				onSlotUpdate?.Invoke(inventory[b.slot], new ItemLocation(ItemPosition.Hotbar, b.slot, this));
-			}
-			else if (a.generalPosition == ItemPosition.Hotbar && b.generalPosition == ItemPosition.Inventory)
-			{
-				ItemStack copy = (ItemStack)hotbar[a.slot].Copy();
-
-				hotbar[a.slot] = (ItemStack)inventory[b.slot].Copy();
-				inventory[b.slot] = (ItemStack)copy.Copy();
-				onSlotUpdate?.Invoke(inventory[a.slot], new ItemLocation(ItemPosition.Hotbar, a.slot, this));
-				onSlotUpdate?.Invoke(inventory[b.slot], new ItemLocation(ItemPosition.Inventory, b.slot, this));
-			}
-			else if (a.generalPosition == ItemPosition.Inventory && b.generalPosition == ItemPosition.Hotbar)
-			{
-				ItemStack copy = (ItemStack)inventory[a.slot].Copy();
-
-				inventory[a.slot] = (ItemStack)hotbar[b.slot].Copy();
-				hotbar[b.slot] = (ItemStack)copy.Copy();
-				onSlotUpdate?.Invoke(inventory[a.slot], new ItemLocation(ItemPosition.Inventory, a.slot, this));
-				onSlotUpdate?.Invoke(inventory[b.slot], new ItemLocation(ItemPosition.Hotbar, b.slot, this));
-			}
-			else if (a.generalPosition == ItemPosition.Inventory && b.generalPosition == ItemPosition.Inventory)
-			{
-				ItemStack copy = (ItemStack)inventory[a.slot].Copy();
-
-				inventory[a.slot] = (ItemStack)inventory[b.slot].Copy();
-				inventory[b.slot] = (ItemStack)copy.Copy();
-				onSlotUpdate?.Invoke(inventory[a.slot], new ItemLocation(ItemPosition.Inventory, a.slot, this));
-				onSlotUpdate?.Invoke(inventory[b.slot], new ItemLocation(ItemPosition.Inventory, b.slot, this));
-			}
+			EditedMergedInventory();
 		}
 
 		ItemLocation SearchForItem(string itemId)
@@ -450,6 +428,18 @@ namespace Inventory.Player
 			return positions.ToArray();
 		}
 
+		int[] LocationsToMergedIndices(ItemLocation[] locations)
+		{
+			int[] indices = new int[locations.Length];
+
+			for (int i = 0; i < indices.Length; i++)
+			{
+				indices[i] = locations[i].GetMergedInventoryIndex();
+			}
+
+			return indices;
+		}
+
 		private bool CheckFullHotbar()
 		{
 			foreach (ItemStack stack in hotbar)
@@ -517,7 +507,10 @@ namespace Inventory.Player
 		void SetHotbarSlot(int index, ItemStack data)
 		{
 			hotbar[index] = data;
-			mergedInventory[index] = hotbar[index].Copy() as ItemStack;
+
+			if(data == null) mergedInventory[index] = null;
+			else mergedInventory[index] = hotbar[index].Copy() as ItemStack;
+
 			onSlotUpdate?.Invoke(hotbar[index], new ItemLocation(ItemPosition.Hotbar, index, this));
 		}
 		int AddItemsToHotbarSlot(int index, int amount)
@@ -542,7 +535,10 @@ namespace Inventory.Player
 		void SetInventorySlot(int index, ItemStack data)
 		{
 			inventory[index] = data;
-			mergedInventory[hotbarSlotAmount + index] = inventory[index].Copy() as ItemStack;
+
+			if(data == null) mergedInventory[hotbarSlotAmount + index] = null;
+			else mergedInventory[hotbarSlotAmount + index] = inventory[index].Copy() as ItemStack;
+
 			onSlotUpdate?.Invoke(inventory[index], new ItemLocation(ItemPosition.Inventory, index, this));
 		}
 		int AddItemsToInventorySlot(int index, int amount)

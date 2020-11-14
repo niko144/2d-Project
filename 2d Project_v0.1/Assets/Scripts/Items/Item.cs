@@ -21,7 +21,7 @@ namespace GameItems
 		{
 			if (itemName.Contains("\t") || itemName.Contains("\n") || itemName.Contains(" "))
 			{
-                throw new System.Exception("Item names should always be a string without spaces!");
+                Printer.Throw("Item names should always be a string without spaces!");
 			}
 
             itemId = $"item_data: {itemName}_{stackSize}_";

@@ -7,16 +7,17 @@ namespace PlayerInput
     {
         public static UserInputSettings current = null;
 
-		// movement
 		public KeyCode up;
 		public KeyCode down;
 		public KeyCode left;
 		public KeyCode right;
-		[Space(10f)] // pickup
+		[Space(10f)]
 		public KeyCode pickUp;
 		public KeyCode drop;
-		[Space(10f)] // menus
+		[Space(10f)]
 		public KeyCode toggleInventory;
+		[Space(10f)]
+		public KeyCode[] hotbarSlots;
 
 		private void Awake()
 		{
@@ -26,7 +27,7 @@ namespace PlayerInput
 			}
 			else
 			{
-				throw new System.Exception("Make sure there is only one game object with the UserInputSettings script attached!");
+				Printer.Throw("Make sure there is only one game object with the UserInputSettings script attached!");
 			}
 		}
 

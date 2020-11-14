@@ -1,15 +1,16 @@
 ﻿using UnityEngine;
-using Inventory.Player;
+using GameItems.Inventorys;
 using GameItems;
 using GameItems.Location;
 using PlayerInput;
+using GameItems.Inventorys.Entitys.Player;
 
-namespace Inventory.Vizualization
+namespace GameItems.Vizualization
 {
 	// Written by Lukas Sacher / Camo
 	public class InventoryVisualization : MonoBehaviour
 	{
-		public GameObject player;
+		GameObject player;
 		PlayerInventory playerInventory;
 		public GameObject slotPrefab;
 		public GameObject itemStackPrefab;
@@ -28,17 +29,20 @@ namespace Inventory.Vizualization
 		{
 			InitializeVariables();
 			InstantiateAllSlots();
+
 			inventoryOpen = transform.GetChild(0).gameObject.activeSelf;
+
 			playerInventory.onSlotUpdate += UpdateSlot;
 			UserInput.toggleInventory += ToggleInventory;
 		}
 
 		void InitializeVariables()
 		{
+			player = GameManager.current.LocalPlayer;
 			playerInventory = player.GetComponent<PlayerInventory>();
 
-			hotbarSlots = new GameObject[playerInventory.hotbarSlotAmount];
-			inventorySlots = new GameObject[playerInventory.inventorySlotAmount];
+			hotbarSlots = new GameObject[playerInventory.HotbarSlotAmount];
+			inventorySlots = new GameObject[playerInventory.InventorySlotAmount];
 		}
 		void InstantiateAllSlots()
 		{
@@ -62,7 +66,7 @@ namespace Inventory.Vizualization
 
 			for (int i = 0; i < hotbar.Length; i++)
 			{
-				Debug.Log(hotbarSlots[i].transform.GetSiblingIndex());
+				Printer.Print(hotbarSlots[i].transform.GetSiblingIndex());
 				if (hotbar[i] == null) continue;
 
 				VisualItemStack stack = Instantiate(itemStackPrefab, hotbarSlots[i].transform).GetComponent<VisualItemStack>();
@@ -97,7 +101,8 @@ namespace Inventory.Vizualization
 
 			for (int i = 0; i < hotbarSlotContainer.childCount; i++)
 			{
-				Instantiate(hotbarSlotContainer.GetChild(i).gameObject, permanentHotbarContainer);
+				GameObject slotContainer = Instantiate(hotbarSlotContainer.GetChild(i).gameObject, permanentHotbarContainer);
+				Destroy(slotContainer.GetComponentInChildren<VisualItemStackDrag>());
 			}
 		}
 
@@ -140,11 +145,11 @@ namespace Inventory.Vizualization
 
 		private ItemStack[] GetHotbarData()
 		{
-			return playerInventory.hotbar;
+			return playerInventory.Hotbar;
 		}
 		private ItemStack[] GetInventoryData()
 		{
-			return playerInventory.inventory;
+			return playerInventory.Inventory;
 		}
 	}
 }

@@ -36,9 +36,9 @@ namespace Chunks
 			loadingDist = ChunkMaster.current.loadingDistance;
 
 			container = transform.GetChild(0).gameObject;
-			if (!container.transform.name.Contains("Container"))
+			if (!container.transform.HasNameTag("Container"))
 			{
-				Debug.LogWarning("The content of a chunks has to be in a seperate container.");
+				Printer.Warn("The content of a chunks has to be in a seperate container.");
 			}
 		}
 

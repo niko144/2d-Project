@@ -10,7 +10,7 @@ public class LocalizationTest : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.Space))
         {
-            Debug.Log(Localization.GetStringForLanguage(wordToGet));
+            Printer.Print(Localization.GetStringForLanguage(wordToGet));
         }
     }
 }

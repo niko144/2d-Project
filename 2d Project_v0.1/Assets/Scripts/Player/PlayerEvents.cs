@@ -20,7 +20,7 @@ namespace Events.Player
             }
             else
             {
-                throw new System.Exception($"Make sure there is only one '{this.GetType().Name}' in the scene.");
+                Printer.Throw($"Make sure there is only one '{this.GetType().Name}' in the scene.");
             }
             InitializeEvents();
         }

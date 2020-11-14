@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using GameItems;
 
-namespace Inventory.Vizualization
+namespace GameItems.Vizualization
 {
     // Written by Lukas Sacher / Camo
     public class VisualItemStack : MonoBehaviour

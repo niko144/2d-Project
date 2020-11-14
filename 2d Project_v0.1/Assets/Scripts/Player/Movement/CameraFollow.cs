@@ -20,7 +20,7 @@ namespace PlayerMovement
         {
             if (target == null)
             {
-                Debug.LogWarning("No target to the camera follow class assigned.");
+                Printer.Warn("No target to the camera follow class assigned.");
                 return;
             }
 

@@ -10,22 +10,20 @@ namespace PlayerInput
 
         static UserInputSettings inputSettings;
 
-        // movement
         public static Action moveUp;
         public static Action moveDown;
         public static Action moveLeft;
         public static Action moveRight;
 
-        // pickup
         public static Action pickUp;
         public static Action drop;
 
-        // menus
         public static Action toggleInventory;
 
-        // handy
         public static Action onInputStart;
         public static Action onInputCompleted;
+
+        public static Action<int> slotSelection;
 
         public static void Setup()
 		{
@@ -37,7 +35,7 @@ namespace PlayerInput
 		{
 			if (!isSetup)
 			{
-                throw new Exception("The UserInput is not setup! Make sure there is a game object with the UserInputSettings script");
+                Printer.Throw("The UserInput is not setup! Make sure there is a game object with the UserInputSettings script");
 			}
 
             onInputStart?.Invoke();
@@ -45,6 +43,7 @@ namespace PlayerInput
             MovementInput();
             PickUpInput();
             MenuInput();
+            HotbarSlotInput();
 
             onInputCompleted?.Invoke();
 		}
@@ -87,6 +86,17 @@ namespace PlayerInput
                 toggleInventory?.Invoke();
             }
         }
+        static void HotbarSlotInput()
+		{
+			for (int i = 0; i < inputSettings.hotbarSlots.Length; i++)
+			{
+				if (Input.GetKeyDown(inputSettings.hotbarSlots[i]))
+				{
+                    slotSelection?.Invoke(i);
+                    break;
+				}
+			}
+		}
 		#endregion
 	}
 }

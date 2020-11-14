@@ -9,7 +9,7 @@ namespace NPC.Drop.Items
     {
         private ItemMaster itemMaster;
         private Rigidbody2D rb;
-        private Vector2 throwDirection;
+        private Vector2 throwDirection = Vector2.zero;
     
 
         public bool canBeThrown;

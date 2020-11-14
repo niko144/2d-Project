@@ -1,14 +1,19 @@
-﻿using GameItems;
-using UnityEngine;
-using GameCrafts;
-using Inventory.Player;
+﻿using UnityEngine;
+using GameItems.Inventorys.Entitys.Player;
+using GameItems.Drop;
+using GameItems.Crafts;
 
-namespace GameCrafts.Manager
+namespace GameItems.Manager
 {
 	// Written by Lukas Sacher / Camo
 	public class Crafter : MonoBehaviour
 	{
-		public PlayerInventory playerInventory;
+		PlayerInventory playerInventory;
+
+		private void Awake()
+		{
+			playerInventory = GameManager.current.LocalPlayer.GetComponent<PlayerInventory>();
+		}
 
 		public void CraftItem(Item item)
 		{
