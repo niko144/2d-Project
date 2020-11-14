@@ -2,7 +2,8 @@
 using PlayerInput;
 using Events.Player;
 
-namespace PlayerStats {
+namespace PlayerStats
+{
 
     //Written By Muneeb Ur Rahman
     public class PlayerHealth : MonoBehaviour

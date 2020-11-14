@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using GameItems;
-using GameItems.Drop;
+using GameItems.Drops;
 
-namespace GameItems.Drop
+namespace GameItems.Drops
 {
-
+	//Written by Lukas Sacher / Camo
 	public class ItemDropManager : MonoBehaviour
 	{
 		public static ItemDropManager current;

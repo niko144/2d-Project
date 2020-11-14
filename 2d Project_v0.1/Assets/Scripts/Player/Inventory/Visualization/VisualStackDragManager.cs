@@ -1,114 +1,116 @@
-﻿using GameItems;
-using GameItems.Location;
-using GameItems.Inventorys;
+﻿using GameItems.Location;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using GameItems.Inventorys.Entitys.Player;
 
-public class VisualStackDragManager : MonoBehaviour
+namespace GameItems.Vizualization
 {
-	public static VisualStackDragManager current = null;
-
-	PlayerInventory inventory = null;
-
-    public Transform inventorySlotContainer;
-    public Transform hotbarSlotContainer;
-    public Transform canvas;
-
-    List<VisualItemStackDrag> filledSlots = new List<VisualItemStackDrag>();
-
-	Action onEndDrag;
-
-	private void Awake()
+	// Written by Lukas Sacher / Camo
+	public class VisualStackDragManager : MonoBehaviour
 	{
-		if (current == null || current.gameObject == null)
+		public static VisualStackDragManager current = null;
+
+		PlayerInventory inventory = null;
+
+		public Transform inventorySlotContainer;
+		public Transform hotbarSlotContainer;
+		public Transform canvas;
+
+		List<VisualItemStackDrag> filledSlots = new List<VisualItemStackDrag>();
+
+		Action onEndDrag;
+
+		private void Awake()
 		{
-			current = this;
-		}
-		else
-		{
-			Printer.Throw($"Make sure there is only one '{this.GetType().Name}' in the scene.");
-		}
-
-		inventory = GameManager.current.LocalPlayer?.GetComponent<PlayerInventory>();
-	}
-
-	private void Start()
-	{
-		inventory.onSlotUpdate += StashGetAllStackDraggers;
-	}
-
-	void Update()
-    {
-		MoveDraggedSlots();
-    }
-
-	void MoveDraggedSlots()
-	{
-		foreach (VisualItemStackDrag slot in filledSlots)
-		{
-			if (slot == null)
+			if (current == null || current.gameObject == null)
 			{
-				continue;
+				current = this;
+			}
+			else
+			{
+				Printer.Throw($"Make sure there is only one '{this.GetType().Name}' in the scene.");
 			}
 
-			if (slot.isDragged)
+			inventory = GameManager.current.LocalPlayer?.GetComponent<PlayerInventory>();
+		}
+
+		private void Start()
+		{
+			inventory.onSlotUpdate += StashGetAllStackDraggers;
+		}
+
+		void Update()
+		{
+			MoveDraggedSlots();
+		}
+
+		void MoveDraggedSlots()
+		{
+			foreach (VisualItemStackDrag slot in filledSlots)
 			{
-				slot.transform.position = Input.mousePosition;
-				return;
+				if (slot == null)
+				{
+					continue;
+				}
+
+				if (slot.isDragged)
+				{
+					slot.transform.position = Input.mousePosition;
+					return;
+				}
+			}
+			InvokeOnEndDrag();
+		}
+
+		void InvokeOnEndDrag()
+		{
+			if (onEndDrag == null) return;
+
+			onEndDrag.Invoke();
+
+			//Unsubscribe all stashed onEndDrag clients
+			Delegate[] clientList = onEndDrag.GetInvocationList();
+
+			foreach (Delegate client in clientList)
+			{
+				onEndDrag -= client as Action;
 			}
 		}
-		InvokeOnEndDrag();
-	}
 
-	void InvokeOnEndDrag()
-	{
-		if (onEndDrag == null) return;
-
-		onEndDrag.Invoke();
-
-		//Unsubscribe all stashed onEndDrag clients
-		Delegate[] clientList = onEndDrag.GetInvocationList();
-
-		foreach (Delegate client in clientList)
+		void StashGetAllStackDraggers(ItemStack stack, ItemLocation location)
 		{
-			onEndDrag -= client as Action;
-		}
-	}
-
-	void StashGetAllStackDraggers(ItemStack stack, ItemLocation location)
-	{
-		// prevent double subscriptions
-		onEndDrag -= GetAllStackDraggers;
-		onEndDrag += GetAllStackDraggers;
-	}
-
-	void GetAllStackDraggers()
-	{
-		filledSlots.Clear();
-
-		for (int i = 0; i < hotbarSlotContainer.childCount; i++)
-		{
-			VisualItemStackDrag item = hotbarSlotContainer.GetChild(i).GetComponentInChildren<VisualItemStackDrag>();
-			if (item == null) continue;
-
-			filledSlots.Add(item);
+			// prevent double subscriptions
+			onEndDrag -= GetAllStackDraggers;
+			onEndDrag += GetAllStackDraggers;
 		}
 
-		for (int i = 0; i < inventorySlotContainer.childCount; i++)
+		void GetAllStackDraggers()
 		{
-			VisualItemStackDrag item = inventorySlotContainer.GetChild(i).GetComponentInChildren<VisualItemStackDrag>();
-			if (item == null) continue;
+			filledSlots.Clear();
 
-			filledSlots.Add(item);
+			for (int i = 0; i < hotbarSlotContainer.childCount; i++)
+			{
+				VisualItemStackDrag item = hotbarSlotContainer.GetChild(i).GetComponentInChildren<VisualItemStackDrag>();
+				if (item == null) continue;
+
+				filledSlots.Add(item);
+			}
+
+			for (int i = 0; i < inventorySlotContainer.childCount; i++)
+			{
+				VisualItemStackDrag item = inventorySlotContainer.GetChild(i).GetComponentInChildren<VisualItemStackDrag>();
+				if (item == null) continue;
+
+				filledSlots.Add(item);
+			}
 		}
-	}
 
-	public void SwitchStackFromTo(ItemLocation previous, ItemLocation current)
-	{
-		if (previous.generalPosition == current.generalPosition && previous.slot == current.slot) return;
+		public void SwitchStackFromTo(ItemLocation previous, ItemLocation current)
+		{
+			if (previous.generalPosition == current.generalPosition && previous.slot == current.slot) return;
 
-		inventory.SwapItemPosition(previous, current);
+			inventory.SwapItemPosition(previous, current);
+		}
 	}
 }

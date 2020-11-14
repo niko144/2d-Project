@@ -2,6 +2,8 @@
 
 namespace GameItems.Location
 {
+	// Written by Lukas Sacher / Camo
+
 	public enum ItemPosition
 	{
 		Inventory,

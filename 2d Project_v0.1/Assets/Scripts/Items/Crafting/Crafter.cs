@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using GameItems.Inventorys.Entitys.Player;
-using GameItems.Drop;
+using GameItems.Drops;
 using GameItems.Crafts;
 
 namespace GameItems.Manager
@@ -12,7 +12,7 @@ namespace GameItems.Manager
 
 		private void Awake()
 		{
-			playerInventory = GameManager.current.LocalPlayer.GetComponent<PlayerInventory>();
+			playerInventory = GameManager.current.GetComponentFromLocalPlayer<PlayerInventory>();
 		}
 
 		public void CraftItem(Item item)

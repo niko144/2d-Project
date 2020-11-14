@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using NPC.Drop;
 
-namespace NPCLootMono
+namespace GameItems.Drops
 {
     public class NPCLoot : MonoBehaviour
     {

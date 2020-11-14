@@ -1,10 +1,9 @@
-﻿
-
-using GameItems.Location;
+﻿using GameItems.Location;
 using UnityEngine;
 
 namespace GameItems
 {
+	// Written by Lukas Sacher / Camo
 	public class ItemStack : ICopyable
 	{
 		public string itemId;

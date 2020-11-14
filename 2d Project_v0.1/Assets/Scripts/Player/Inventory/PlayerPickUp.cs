@@ -2,19 +2,23 @@
 using PlayerInput;
 using Events.Entitys;
 
-public class PlayerPickUp : MonoBehaviour
+namespace GameItems.PickUp
 {
-	private void OnEnable()
+	// Written by Lukas Sacher / Camo
+	public class PlayerPickUp : MonoBehaviour
 	{
-		UserInput.pickUp += PickUp;
-	}
-	private void OnDisable()
-	{
-		UserInput.pickUp -= PickUp;
-	}
+		private void OnEnable()
+		{
+			UserInput.pickUp += PickUp;
+		}
+		private void OnDisable()
+		{
+			UserInput.pickUp -= PickUp;
+		}
 
-	void PickUp()
-	{
-		(EntityEvents.current.events[typeof(EntityPickUpEvents)] as EntityPickUpEvents).EntityPickUp(gameObject);
+		void PickUp()
+		{
+			(EntityEvents.current.events[typeof(EntityPickUpEvents)] as EntityPickUpEvents).EntityPickUp(gameObject);
+		}
 	}
 }

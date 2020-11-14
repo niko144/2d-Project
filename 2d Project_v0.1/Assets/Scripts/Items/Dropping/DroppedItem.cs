@@ -5,7 +5,7 @@ using System;
 using Events.Entitys;
 using GameItems.Inventorys.Entitys;
 
-namespace GameItems.Drop
+namespace GameItems.Drops
 {
 	// Written by Lukas Sacher / Camo
 

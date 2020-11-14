@@ -1,8 +1,6 @@
-﻿using GameItems;
-using UnityEngine;
-using NPCLootMono;
+﻿using UnityEngine;
 
-namespace NPC.Drop
+namespace GameItems.Drops
 {
     //Written by Muneeb UR Rahman
     [CreateAssetMenu(fileName = "NewDropData", menuName = "NPCDropData")]

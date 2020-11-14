@@ -1,52 +1,52 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using GameItems.Inventorys;
-using GameItems;
+﻿using UnityEngine;
 using PlayerInput;
-using GameItems.Inventorys.Entitys.Player;
 
-[RequireComponent(typeof(PlayerInventory))]
-public class PlayerInventoryItemSelection : MonoBehaviour
+
+namespace GameItems.Inventorys.Entitys.Player
 {
-    PlayerInventory inventory;
-
-    public GameObject slotSelectionUiPrefab;
-    GameObject slotSelectionUiObj;
-
-    public Transform hotbarSlotsContainer;
-    Transform[] uiHotabarSlots;
-    public ItemStack selected { get; private set; }
-    public bool selectedUseable { get; private set; }
-
-    void Awake()
+    // Written by Lukas Sacher / Camo
+    [RequireComponent(typeof(PlayerInventory))]
+    public class PlayerInventoryItemSelection : MonoBehaviour
     {
-        inventory = GetComponent<PlayerInventory>();
-    }
+        PlayerInventory inventory;
 
-	private void Start()
-	{
-        UserInput.slotSelection += SelectSlot;
+        public GameObject slotSelectionUiPrefab;
+        GameObject slotSelectionUiObj;
 
-        uiHotabarSlots = new Transform[hotbarSlotsContainer.childCount];
+        public Transform hotbarSlotsContainer;
+        Transform[] uiHotabarSlots;
+        public ItemStack selected { get; private set; }
+        public bool selectedUseable { get; private set; }
 
-		for (int i = 0; i < hotbarSlotsContainer.childCount; i++)
-		{
-            uiHotabarSlots[i] = hotbarSlotsContainer.GetChild(i);
-		}
+        void Awake()
+        {
+            inventory = GetComponent<PlayerInventory>();
+        }
 
-        slotSelectionUiObj = Instantiate(slotSelectionUiPrefab, hotbarSlotsContainer.parent);
-	}
+        private void Start()
+        {
+            UserInput.slotSelection += SelectSlot;
 
-	void SelectSlot(int slot)
-	{
-        SelectSlotUiVisualization(slot);
+            uiHotabarSlots = new Transform[hotbarSlotsContainer.childCount];
 
-        selected = inventory.Hotbar[slot]?.Copy() as ItemStack;
-	}
+            for (int i = 0; i < hotbarSlotsContainer.childCount; i++)
+            {
+                uiHotabarSlots[i] = hotbarSlotsContainer.GetChild(i);
+            }
 
-    void SelectSlotUiVisualization(int slot)
-	{
+            slotSelectionUiObj = Instantiate(slotSelectionUiPrefab, hotbarSlotsContainer.parent);
+        }
 
+        void SelectSlot(int slot)
+        {
+            SelectSlotUiVisualization(slot);
+
+            selected = inventory.Hotbar[slot]?.Copy() as ItemStack;
+        }
+
+        void SelectSlotUiVisualization(int slot)
+        {
+
+        }
     }
 }

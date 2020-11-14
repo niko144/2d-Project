@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace GameItems.Inventorys.Entitys
 {
+	// Written by Lukas Sacher / Camo
 	public abstract class EntityInventory : MonoBehaviour
 	{
 		public abstract int AddStack(ItemStack stack);

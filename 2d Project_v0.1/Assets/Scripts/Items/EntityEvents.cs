@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 namespace Events.Entitys
 {
+	// Written by Lukas Sacher / Camo
 	public class EntityEvents : MonoBehaviour
 	{
 		public static EntityEvents current = null;
